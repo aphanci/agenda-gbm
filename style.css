@@ -198,6 +198,33 @@ img { max-width: 100%; }
   color: var(--accent);
 }
 .status-kicker.repos { color: var(--encre-3); }
+
+/* Le badge d'état : « Ouvert » pendant l'événement, « Terminé » après. */
+.badge-etat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  vertical-align: 1px;
+  margin-right: 9px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+.badge-ouvert { background: var(--direct-fond); color: var(--direct-texte); }
+.badge-ouvert i {
+  display: block;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: battement 2.2s ease-in-out infinite;
+}
+.badge-fini { border: 1px solid var(--encre-3); color: var(--encre-3); }
+.kicker-txt { color: var(--accent); }
+@media (prefers-reduced-motion: reduce) { .badge-ouvert i { animation: none; } }
+
 .status-titre {
   margin: 3px 0 0;
   font-family: var(--serif);
@@ -205,6 +232,19 @@ img { max-width: 100%; }
   font-weight: 600;
   line-height: 1.3;
   text-wrap: balance;
+}
+
+/* Le compte à rebours avant l'ouverture.
+   font-variant-numeric: tabular-nums force tous les chiffres à la même
+   largeur : sans lui, le compteur tremblerait à chaque seconde. */
+.status-titre.compteur {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(20px, 5.8vw, 26px);
+  font-weight: 600;
+  letter-spacing: -.01em;
+  color: var(--accent);
+  margin-top: 5px;
 }
 .status-sous,
 .status-aussi {

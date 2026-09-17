@@ -26,6 +26,7 @@
   var UI = {
     fr: {
       ouvreDans: "Ouverture dans", ouvertureTitre: "Début de l'événement",
+      ouvert: "Ouvert", badgeFini: "Terminé",
       enCours: "En cours", aSuivre: "À suivre dans",
       termine: "Événement terminé", mercíTitre: "Merci de votre participation",
       termineSous: "L'événement est achevé.",
@@ -55,6 +56,7 @@
     },
     en: {
       ouvreDans: "Opens in", ouvertureTitre: "Start of the event",
+      ouvert: "Open", badgeFini: "Ended",
       enCours: "Happening now", aSuivre: "Up next in",
       termine: "Event ended", mercíTitre: "Thank you for joining us",
       termineSous: "The event has ended.",
@@ -160,6 +162,28 @@
 
   /* Les heures s'écrivent « 13h00 » en français, « 13:00 » en anglais. */
   function heure(hhmm) { return LANGUE === "fr" ? hhmm.replace(":", "h") : hhmm; }
+
+  /* Le compte à rebours détaillé, jusqu'à la seconde.
+     Les heures, minutes et secondes sont toujours sur DEUX chiffres :
+     sans cela, le passage de « 9 s » à « 10 s » changerait la largeur
+     du texte et tout le compteur sautillerait à chaque seconde.
+     La police à chasse fixe et font-variant-numeric: tabular-nums,
+     côté CSS, achèvent de le stabiliser. */
+  function compteARebours(ms) {
+    if (ms < 0) ms = 0;
+    var s = Math.floor(ms / 1000);
+    var j = Math.floor(s / 86400); s -= j * 86400;
+    var h = Math.floor(s / 3600);  s -= h * 3600;
+    var m = Math.floor(s / 60);    s -= m * 60;
+
+    var U = LANGUE === "fr" ? ["j", "h", "min", "s"] : ["d", "h", "min", "s"];
+    var bouts = [];
+    if (j > 0) bouts.push(j + " " + U[0]);
+    if (j > 0 || h > 0) bouts.push(deuxChiffres(h) + " " + U[1]);
+    bouts.push(deuxChiffres(m) + " " + U[2]);
+    bouts.push(deuxChiffres(s) + " " + U[3]);
+    return bouts.join(" ");
+  }
 
   /* ============================================================
      4. LE CHARGEMENT DES DONNÉES
@@ -465,24 +489,32 @@
     var toutes = toutesLesSessions();
 
     aussi.hidden = true;
+    titre.className = "status-titre";
 
+    /* ---- AVANT L'OUVERTURE : le compte à rebours, à la seconde ---- */
     if (t < PROGRAMME.ouverture) {
       kicker.className = "status-kicker";
-      kicker.textContent = T.ouvreDans + " " + duree(PROGRAMME.ouverture - t);
-      titre.textContent = T.ouvertureTitre;
-      sous.innerHTML = '<span class="horloge">' + echapper(PROGRAMME.jours[0].dateCourte[LANGUE])
-        + " · " + heure(PROGRAMME.jours[0].sessions[0].debut) + "</span> "
-        + echapper(PROGRAMME.meta.lieu[LANGUE]);
+      kicker.textContent = T.ouvreDans;
+      titre.className = "status-titre compteur";
+      titre.textContent = compteARebours(PROGRAMME.ouverture - t);
+      sous.innerHTML = echapper(T.ouvertureTitre) + ' <span class="horloge">'
+        + echapper(PROGRAMME.jours[0].dateCourte[LANGUE])
+        + " · " + heure(PROGRAMME.jours[0].sessions[0].debut) + "</span>";
       return;
     }
 
+    /* ---- APRÈS LA CLÔTURE ---- */
     if (t >= PROGRAMME.fermeture) {
-      kicker.className = "status-kicker repos";
-      kicker.textContent = T.termine;
+      kicker.className = "status-kicker";
+      kicker.innerHTML = '<span class="badge-etat badge-fini">' + echapper(T.badgeFini) + "</span>";
       titre.textContent = T.mercíTitre;
       sous.textContent = T.termineSous;
       return;
     }
+
+    /* ---- PENDANT L'ÉVÉNEMENT : le badge « Ouvert » reste affiché ---- */
+    var badgeOuvert = '<span class="badge-etat badge-ouvert"><i></i>'
+      + echapper(T.ouvert) + "</span>";
 
     /* Les sessions en cours, triées par priorité décroissante.
        Une conférence bornée (priorité 2) passe devant un espace
@@ -494,10 +526,10 @@
     if (enCours.length) {
       var cur = enCours[0];
       kicker.className = "status-kicker";
-      kicker.innerHTML = '<span class="pastille"></span>' + echapper(T.enCours);
+      kicker.innerHTML = badgeOuvert + '<span class="kicker-txt">' + echapper(T.enCours) + "</span>";
       titre.textContent = cur.titre[LANGUE];
       var bits = '<span class="horloge">' + heure(cur.debut) + " – " + heure(cur.fin) + "</span>"
-        + echapper(T.seTermineDans) + " " + duree(cur.t1 - t);
+        + echapper(T.seTermineDans) + " " + compteARebours(cur.t1 - t);
       if (enCours.length > 1) {
         bits += " · +" + (enCours.length - 1) + " " + echapper(T.enParallele);
       }
@@ -519,7 +551,8 @@
     if (prochaine) {
       var memeJour = prochaine.jour === PROGRAMME.jours[jourParDefaut()];
       kicker.className = "status-kicker";
-      kicker.textContent = T.aSuivre + " " + duree(prochaine.t0 - t);
+      kicker.innerHTML = badgeOuvert + '<span class="kicker-txt">'
+        + echapper(T.aSuivre) + " " + compteARebours(prochaine.t0 - t) + "</span>";
       titre.textContent = prochaine.titre[LANGUE];
       sous.innerHTML = '<span class="horloge">'
         + (memeJour ? "" : echapper(prochaine.jour.dateCourte[LANGUE]) + " · ")
@@ -533,8 +566,8 @@
       return;
     }
 
-    kicker.className = "status-kicker repos";
-    kicker.textContent = T.pause;
+    kicker.className = "status-kicker";
+    kicker.innerHTML = badgeOuvert + '<span class="kicker-txt">' + echapper(T.pause) + "</span>";
     titre.textContent = T.pauseTitre;
     sous.textContent = "";
   }
