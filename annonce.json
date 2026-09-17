@@ -1,0 +1,18 @@
+{
+  "actif": false,
+  "niveau": "info",
+  "message": {
+    "fr": "",
+    "en": ""
+  },
+  "maj": "2026-09-17T20:00:00Z",
+
+  "_mode_emploi": [
+    "Pour afficher une annonce sur tous les ecrans : passer actif a true,",
+    "ecrire les deux messages, puis publier le fichier sur GitHub.",
+    "niveau accepte : info (bleu) ou alerte (orange).",
+    "Pour retirer l'annonce : repasser actif a false.",
+    "JSON n'accepte pas de commentaires : ce mode d'emploi est une cle du fichier,",
+    "que le code ignore volontairement."
+  ]
+}

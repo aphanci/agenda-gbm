@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Agenda — Journées Portes Ouvertes GBM</title>
+
+    <!-- Couleur de la barre système du téléphone quand l'app est installée -->
+    <meta name="theme-color" content="#0C2340">
+
+    <!-- Le manifeste : c'est lui qui rend la page installable -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icones/icone-192.png">
+    <link rel="apple-touch-icon" href="icones/icone-192.png">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+    <link rel="stylesheet" href="style.css">
+  </head>
+
+  <body>
+    <div class="wrap">
+
+      <!-- ===== Bandeau de l'événement ===== -->
+      <header class="masthead">
+        <div class="langsw" role="group" aria-label="Langue / Language">
+          <button type="button" id="btnFr" aria-pressed="true">FR</button>
+          <button type="button" id="btnEn" aria-pressed="false">EN</button>
+        </div>
+        <p class="eyebrow" id="mSurtitre"></p>
+        <h1 id="mTitre"></h1>
+        <div class="meta">
+          <span id="mTheme"></span>
+          <span id="mLieu"></span>
+        </div>
+      </header>
+
+      <!-- ===== Bandeau d'annonce (masqué tant qu'il n'y a rien à dire) ===== -->
+      <div class="annonce" id="annonce" hidden role="status">
+        <span class="annonce-tag" id="annonceTag"></span>
+        <p id="annonceTexte"></p>
+      </div>
+
+      <!-- ===== Barre de statut : que se passe-t-il maintenant ? ===== -->
+      <section class="status" id="status" aria-live="polite">
+        <span class="status-kicker" id="statusKicker"></span>
+        <p class="status-titre" id="statusTitre"></p>
+        <p class="status-sous" id="statusSous"></p>
+        <p class="status-aussi" id="statusAussi" hidden></p>
+      </section>
+
+      <!-- ===== Onglets des journées ===== -->
+      <div class="tabs" role="tablist" id="tabs"></div>
+
+      <div class="daybar">
+        <p class="sous-titre" id="sousTitre"></p>
+        <button class="filtre" id="btnFiltre" type="button" aria-pressed="false">
+          <span aria-hidden="true">★</span> <span id="filtreLabel"></span>
+        </button>
+      </div>
+
+      <!-- ===== La liste des sessions ===== -->
+      <ul class="rail" id="rail"></ul>
+
+      <!-- ===== Informations pratiques ===== -->
+      <section class="infos">
+        <h2 id="infosTitre"></h2>
+        <dl id="infosListe"></dl>
+
+        <details class="howto">
+          <summary id="howtoTitre"></summary>
+          <div id="howtoCorps"></div>
+        </details>
+
+        <p class="credit" id="credit"></p>
+      </section>
+
+    </div>
+
+    <button class="jump" id="btnJump" type="button" hidden>
+      <i></i> <span id="jumpLabel"></span>
+    </button>
+
+    <script src="app.js"></script>
+  </body>
+</html>
