@@ -139,7 +139,9 @@ img { max-width: 100%; }
 }
 .masthead .eyebrow {
   margin: 0 0 9px;
-  padding-right: 74px;
+  /* Réserve la place des deux groupes de réglages posés au-dessus :
+     sans ce dégagement, le surtitre passerait dessous. */
+  padding-right: 142px;
   font-size: 10.5px;
   font-weight: 700;
   letter-spacing: .15em;
@@ -165,16 +167,27 @@ img { max-width: 100%; }
   color: var(--bandeau-texte);
 }
 
-.langsw {
+/* Les deux réglages du visiteur : le thème et la langue.
+   Un seul conteneur les positionne ; chaque groupe garde sa propre
+   bordure, ce qui les lit comme deux commandes distinctes. */
+.reglages {
   position: absolute;
   top: 18px;
   right: 16px;
+  display: flex;
+  gap: 8px;
+}
+
+/* La règle du composant est écrite UNE fois et sert aux deux groupes.
+   Le jour où tu ajoutes un troisième réglage, il n'y a rien à copier :
+   il suffit de lui donner la classe « segment ». */
+.segment {
   display: flex;
   border: 1px solid var(--filet);
   border-radius: 5px;
   overflow: hidden;
 }
-.langsw button {
+.segment button {
   appearance: none;
   background: none;
   border: 0;
@@ -185,12 +198,41 @@ img { max-width: 100%; }
   font-weight: 700;
   letter-spacing: .06em;
   color: var(--encre-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
 }
 /* Le bouton actif reprend le couple fond/texte déjà vérifié
    pour l'état « en cours » : lisible dans les deux thèmes. */
-.langsw button[aria-pressed="true"] {
+.segment button[aria-pressed="true"] {
   background: var(--direct-fond);
   color: var(--direct-texte);
+}
+
+/* Les pictogrammes du thème. « currentColor » est la clé : le trait
+   prend la couleur du texte du bouton, donc il s'inverse tout seul
+   quand le bouton devient actif. Aucune couleur n'est écrite ici. */
+.themesw button { padding: 5px 7px; }
+.themesw svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+
+/* Un libellé lu par les lecteurs d'écran, invisible à l'œil.
+   On ne met pas « display:none » : cela le retirerait aussi de la
+   lecture vocale, et le bouton n'annoncerait plus qu'un dessin muet. */
+.lecteur-ecran {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ---------- 4. L'ANNONCE ---------- */

@@ -36,6 +36,7 @@
       enParallele: "en parallèle", aussiOuvert: "Aussi ouvert maintenant :",
       mesSessions: "Mes sessions", toutAgenda: "Tout l'agenda",
       jumpLabel: "Aller à maintenant",
+      themeClair: "Affichage clair", themeSombre: "Affichage sombre",
       intervenants: "Intervenants", ajouterAgenda: "Ajouter à mon agenda",
       marquer: "Marquer cette session",
       videEtoiles: "Aucune session marquée pour ce jour. Touchez l'étoile ★ d'une session pour la retrouver ici.",
@@ -105,6 +106,7 @@
       enParallele: "in parallel", aussiOuvert: "Also open now:",
       mesSessions: "My sessions", toutAgenda: "Full agenda",
       jumpLabel: "Jump to now",
+      themeClair: "Light display", themeSombre: "Dark display",
       intervenants: "Speakers", ajouterAgenda: "Add to my calendar",
       marquer: "Mark this session",
       videEtoiles: "No sessions marked for this day. Tap the ★ on a session to find it here.",
@@ -177,8 +179,14 @@
   var noeuds = [];        // les lignes affichées, pour les rafraîchir sans tout reconstruire
   var etoiles = {};
 
+  /* Le thème vaut "auto", "light" ou "dark".
+     "auto" n'est pas un troisième habillage : c'est l'absence de choix,
+     et la feuille de style laisse alors décider le téléphone. */
+  var THEME = "auto";
+
   var CLE_LANGUE = "agenda-langue";
   var CLE_ETOILES = "agenda-etoiles";
+  var CLE_THEME = "agenda-theme";   // la même clé que le script de l'en-tête
 
   var $ = function (id) { return document.getElementById(id); };
 
@@ -386,6 +394,13 @@
 
     $("btnFr").setAttribute("aria-pressed", LANGUE === "fr" ? "true" : "false");
     $("btnEn").setAttribute("aria-pressed", LANGUE === "en" ? "true" : "false");
+
+    /* Les boutons du thème ne portent qu'un dessin : sans ces libellés,
+       un lecteur d'écran annoncerait « bouton », sans rien de plus. */
+    $("labClair").textContent = T.themeClair;
+    $("labSombre").textContent = T.themeSombre;
+    $("btnClair").setAttribute("title", T.themeClair);
+    $("btnSombre").setAttribute("title", T.themeSombre);
 
     $("filtreLabel").textContent = filtreEtoiles ? T.toutAgenda : T.mesSessions;
     $("jumpLabel").textContent = T.jumpLabel;
@@ -1186,6 +1201,62 @@
   }
 
   /* ============================================================
+     LE THÈME — clair ou sombre
+     ============================================================
+     Trois états, pas deux :
+
+       "auto"  -> aucun attribut sur <html>. La feuille de style suit
+                  le réglage du téléphone, via prefers-color-scheme.
+       "light" -> data-theme="light" : le visiteur impose le clair.
+       "dark"  -> data-theme="dark"  : le visiteur impose le sombre.
+
+     Tant qu'il n'a rien touché, on ne décide pas à sa place : un
+     téléphone en mode nuit ouvre l'agenda en sombre, tout seul.
+     Dès qu'il appuie, son choix l'emporte et il est conservé.
+     ============================================================ */
+
+  /* Ce que le visiteur VOIT réellement, les trois états ramenés à deux.
+     C'est cette valeur qui allume le bon bouton — jamais THEME, sinon
+     en mode "auto" les deux boutons resteraient éteints et la barre
+     aurait l'air cassée. */
+  function themeEffectif() {
+    if (THEME === "dark" || THEME === "light") return THEME;
+    try {
+      return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    } catch (e) {
+      return "light";
+    }
+  }
+
+  function appliquerTheme() {
+    var racine = document.documentElement;
+
+    if (THEME === "auto") racine.removeAttribute("data-theme");
+    else racine.setAttribute("data-theme", THEME);
+
+    var vu = themeEffectif();
+    $("btnClair").setAttribute("aria-pressed", vu === "light" ? "true" : "false");
+    $("btnSombre").setAttribute("aria-pressed", vu === "dark" ? "true" : "false");
+
+    /* La barre système du téléphone doit suivre le bandeau, sinon on
+       voit une couture de couleur en haut de l'écran.
+
+       On ne réécrit PAS la couleur en dur ici : on va la lire dans le
+       token --bandeau-fond que le CSS vient de recalculer. Le jour où
+       tu changes la charte, tu ne modifies que style.css — ce code
+       continue de dire vrai sans qu'on y touche. */
+    var fond = getComputedStyle(racine).getPropertyValue("--bandeau-fond").trim();
+    if (fond) $("metaTheme").setAttribute("content", fond);
+  }
+
+  function changerTheme(choix) {
+    if (choix === THEME) return;
+    THEME = choix;
+    try { localStorage.setItem(CLE_THEME, THEME); } catch (e) { }
+    appliquerTheme();
+  }
+
+  /* ============================================================
      LA MÉMOIRE DU VISITEUR
      Tout est enveloppé : en navigation privée, localStorage peut
      refuser de répondre. La page doit continuer sans lui.
@@ -1202,6 +1273,10 @@
       var brut = localStorage.getItem(CLE_ETOILES);
       if (brut) etoiles = JSON.parse(brut) || {};
     } catch (e) { etoiles = {}; }
+    try {
+      var th = localStorage.getItem(CLE_THEME);
+      if (th === "dark" || th === "light") THEME = th;
+    } catch (e) { }
   }
   function sauverEtoiles() {
     try { localStorage.setItem(CLE_ETOILES, JSON.stringify(etoiles)); } catch (e) { }
@@ -1224,6 +1299,12 @@
 
   function demarrer() {
     lireMemoire();
+
+    /* Avant même de charger le programme : l'attribut a déjà été posé
+       par le script de l'en-tête, mais c'est ici qu'on allume le bon
+       bouton et qu'on accorde la barre système. */
+    appliquerTheme();
+
     $("statusTitre").textContent = UI[LANGUE].chargement;
 
     charger("programme.json").then(function (prog) {
@@ -1247,6 +1328,19 @@
       // Les boutons
       $("btnFr").addEventListener("click", function () { changerLangue("fr"); });
       $("btnEn").addEventListener("click", function () { changerLangue("en"); });
+
+      $("btnClair").addEventListener("click", function () { changerTheme("light"); });
+      $("btnSombre").addEventListener("click", function () { changerTheme("dark"); });
+
+      /* Si le visiteur n'a rien imposé et que son téléphone bascule en
+         mode nuit pendant qu'il lit — beaucoup le font au coucher du
+         soleil — l'agenda suit sans qu'il ait à recharger. */
+      try {
+        var veille = window.matchMedia("(prefers-color-scheme: dark)");
+        var suivre = function () { if (THEME === "auto") appliquerTheme(); };
+        if (veille.addEventListener) veille.addEventListener("change", suivre);
+        else if (veille.addListener) veille.addListener(suivre);   // vieux Safari
+      } catch (e) { }
 
       $("btnFiltre").addEventListener("click", function () {
         filtreEtoiles = !filtreEtoiles;

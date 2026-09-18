@@ -5,8 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Agenda — Journées Portes Ouvertes GBM</title>
 
-    <!-- Couleur de la barre système du téléphone quand l'app est installée -->
-    <meta name="theme-color" content="#0C2340">
+    <!-- Couleur de la barre système du téléphone quand l'app est installée.
+         Elle porte un id : le JavaScript la change avec le thème, sinon on
+         aurait une barre sombre au-dessus d'une page claire. -->
+    <meta name="theme-color" id="metaTheme" content="#F7F9FC">
+
+    <!-- ============================================================
+         LE SCRIPT ANTI-CLIGNOTEMENT
+         ============================================================
+         Ce script minuscule est le SEUL de la page à se trouver dans
+         l'en-tête, et c'est volontaire.
+
+         app.js est chargé tout en bas, après le contenu : c'est la
+         bonne pratique, la page s'affiche sans l'attendre. Mais si le
+         choix « sombre » n'était appliqué que par app.js, le navigateur
+         aurait déjà peint la page en clair — le visiteur verrait un
+         éclair blanc à chaque ouverture. Dans une salle sombre, c'est
+         désagréable au point qu'on croit à un bug.
+
+         Placé ici, ce script s'exécute AVANT le premier pixel.
+         Il ne fait qu'une chose, et il ne doit jamais en faire plus.
+         ============================================================ -->
+    <script>
+      try {
+        var t = localStorage.getItem("agenda-theme");
+        if (t === "dark" || t === "light") {
+          document.documentElement.setAttribute("data-theme", t);
+        }
+      } catch (e) { /* navigation privée : on garde le thème du téléphone */ }
+    </script>
 
     <!-- Le manifeste : c'est lui qui rend la page installable -->
     <link rel="manifest" href="manifest.json">
@@ -23,9 +50,34 @@
 
       <!-- ===== Bandeau de l'événement ===== -->
       <header class="masthead">
-        <div class="langsw" role="group" aria-label="Langue / Language">
-          <button type="button" id="btnFr" aria-pressed="true">FR</button>
-          <button type="button" id="btnEn" aria-pressed="false">EN</button>
+        <!-- Les deux réglages du visiteur, groupés en haut à droite. -->
+        <div class="reglages">
+
+          <div class="segment themesw" role="group" aria-label="Thème / Theme">
+            <button type="button" id="btnClair" aria-pressed="false" title="Clair">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="4.2"></circle>
+                <path d="M12 2.6v2.2M12 19.2v2.2M4.2 12H2M22 12h-2.2
+                         M6.5 6.5 4.9 4.9M19.1 19.1l-1.6-1.6
+                         M17.5 6.5l1.6-1.6M4.9 19.1l1.6-1.6"></path>
+              </svg>
+              <span class="lecteur-ecran" id="labClair"></span>
+            </button>
+            <button type="button" id="btnSombre" aria-pressed="false" title="Sombre">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20.5 14.3A8.6 8.6 0 1 1 9.7 3.5a6.9 6.9 0 0 0 10.8 10.8z"></path>
+              </svg>
+              <span class="lecteur-ecran" id="labSombre"></span>
+            </button>
+          </div>
+
+          <div class="segment langsw" role="group" aria-label="Langue / Language">
+            <button type="button" id="btnFr" aria-pressed="true">FR</button>
+            <button type="button" id="btnEn" aria-pressed="false">EN</button>
+          </div>
+
         </div>
         <p class="eyebrow" id="mSurtitre"></p>
         <h1 id="mTitre"></h1>
