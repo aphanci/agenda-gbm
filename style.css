@@ -795,7 +795,31 @@ body.avec-install .jump { margin-bottom: 92px; }
 .form { padding: 18px 16px 0; display: flex; flex-direction: column; gap: 16px; }
 .form-intro { margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--encre-2); }
 
+/* Quand le verrou est actif, rien ne bouge derrière le panneau. */
+body.verrouille { overflow: hidden; }
+
+.duo { display: flex; gap: 12px; }
+.duo .champ { flex: 1 1 0; min-width: 0; }
+
 .champ { display: flex; flex-direction: column; gap: 6px; }
+.champ select {
+  font-family: var(--sans);
+  font-size: 16px;
+  color: var(--encre);
+  background: var(--surface);
+  border: 1px solid var(--filet);
+  border-radius: 7px;
+  padding: 11px 12px;
+  min-height: 44px;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--encre-3) 50%),
+                    linear-gradient(135deg, var(--encre-3) 50%, transparent 50%);
+  background-position: calc(100% - 19px) 50%, calc(100% - 14px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 36px;
+}
+.champ select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .champ-nom { font-size: 12.5px; font-weight: 600; color: var(--encre); }
 .champ-aide { font-size: 11.5px; line-height: 1.4; color: var(--encre-3); }
 .champ input {
@@ -861,6 +885,23 @@ body.avec-install .jump { margin-bottom: 92px; }
 }
 .form-envoyer:disabled { opacity: .6; cursor: default; }
 .form-note { margin: 0; font-size: 11.5px; line-height: 1.45; color: var(--encre-3); text-align: center; }
+
+/* Le cadre qui accueille le formulaire Microsoft */
+.cadre-zone { padding: 18px 16px 0; display: flex; flex-direction: column; gap: 16px; }
+.cadre-boite {
+  background: var(--surface);
+  border: 1px solid var(--filet);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.cadre-boite iframe {
+  display: block;
+  width: 100%;
+  height: 620px;
+  border: 0;
+  background: var(--surface);
+}
+@media (min-height: 800px) { .cadre-boite iframe { height: 700px; } }
 
 .merci { padding: 44px 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .merci-ico {

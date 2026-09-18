@@ -89,7 +89,9 @@
       errEmail: "Cette adresse e-mail ne semble pas valide.",
       errConsent: "Merci de cocher la case pour poursuivre.",
       errReseau: "L'envoi n'a pas abouti. Vos informations sont conservées sur cet appareil et repartiront automatiquement dès que le réseau reviendra.",
-      dejaInscrit: "Vous êtes enregistré"
+      dejaInscrit: "Vous êtes enregistré",
+      cadreTermine: "J'ai terminé — voir le programme",
+      cadreNote: "Envoyez d'abord le formulaire ci-dessus, puis touchez ce bouton."
     },
     en: {
       ouvreDans: "Opens in", ouvertureTitre: "Start of the event",
@@ -156,7 +158,9 @@
       errEmail: "That email address does not look valid.",
       errConsent: "Please tick the box to continue.",
       errReseau: "The submission did not go through. Your details are kept on this device and will be sent automatically once the network is back.",
-      dejaInscrit: "You are registered"
+      dejaInscrit: "You are registered",
+      cadreTermine: "I'm done — show the programme",
+      cadreNote: "Submit the form above first, then tap this button."
     }
   };
 
@@ -872,13 +876,27 @@
     return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
   }
 
-  /* Le verrou : l'agenda n'est lisible qu'une fois enregistré.
-     Il ne s'active que si les données le demandent ET qu'une adresse
-     d'envoi existe — sans quoi on enfermerait les visiteurs dehors
-     sans pouvoir enregistrer personne. */
+  /* Deux destinations possibles, selon ce que la politique de sécurité
+     de l'organisation autorise :
+       • "formulaire" — un formulaire Microsoft Forms dans un cadre
+       • "flux"       — le formulaire maison qui envoie à Power Automate
+     Le code ne privilégie ni l'un ni l'autre : les données décident. */
+  function modeFormulaire() {
+    var c = PROGRAMME.inscription;
+    return !!(c && c.mode === "formulaire");
+  }
+
+  /* Y a-t-il quelque part où envoyer ? Sans destination, on n'affiche
+     rien du tout — surtout pas un verrou qui enfermerait les visiteurs
+     dehors sans pouvoir enregistrer personne. */
+  function destinationPrete() {
+    var c = PROGRAMME.inscription;
+    if (!c || c.active !== true) return false;
+    return modeFormulaire() ? !!c.formulaireUrl : !!c.url;
+  }
+
   function verrouActif() {
-    var conf = PROGRAMME.inscription;
-    return !!(conf && conf.active === true && conf.url && conf.obligatoire === true);
+    return destinationPrete() && PROGRAMME.inscription.obligatoire === true;
   }
 
   /* Remplit la liste déroulante des qualités à partir des données. */
@@ -977,6 +995,17 @@
     // Même exigence pour la note sous le bouton d'envoi.
     $("formNote").textContent = verrou ? "" : T.formNote;
     $("formNote").hidden = verrou;
+
+    /* Le cadre Microsoft reprend la même introduction et le même avis :
+       le visiteur lit TES mots avant de voir les champs de Microsoft. */
+    if (modeFormulaire()) {
+      $("cadreIntro").textContent = $("formIntro").textContent;
+      $("cadreAvisTitre").textContent = T.avisTitre;
+      $("cadreAvisTexte").textContent = $("avisTexte").textContent + " " + $("avisDroits").textContent;
+      $("cadreTermine").textContent = T.cadreTermine;
+      $("cadreNote").textContent = T.cadreNote;
+      $("cadreForm").setAttribute("title", T.formTitre);
+    }
   }
 
   function montrerBandeauInscrire() {
@@ -1000,13 +1029,35 @@
   }
 
   function preparerInscription() {
-    var conf = PROGRAMME.inscription;
-    if (!conf || conf.active !== true || !conf.url) return;
+    if (!destinationPrete()) return;
 
+    var conf = PROGRAMME.inscription;
     var verrou = verrouActif();
 
     peindreFormulaire();
-    viderLaFileDAttente();
+
+    if (modeFormulaire()) {
+      /* On ne charge le formulaire Microsoft QUE si on va l'afficher :
+         inutile de solliciter le réseau d'un visiteur déjà enregistré. */
+      $("formInscription").hidden = true;
+      $("cadreZone").hidden = false;
+      if (!estInscrit()) $("cadreForm").setAttribute("src", conf.formulaireUrl);
+
+      /* Impossible de savoir depuis l'extérieur si le formulaire a été
+         envoyé : il appartient à un autre domaine, et le navigateur
+         nous interdit de regarder dedans. C'est donc le visiteur qui
+         nous le dit. Le verrou n'a jamais été une serrure, seulement
+         un passage obligé — cela ne change rien à son efficacité. */
+      $("cadreTermine").addEventListener("click", function () {
+        noterInscrit();
+        $("inscrireBandeau").hidden = true;
+        $("formFermer").hidden = false;
+        document.body.classList.remove("verrouille");
+        fermerPanneau();
+      });
+    } else {
+      viderLaFileDAttente();
+    }
 
     if (verrou) {
       // Mode verrou : pas de bandeau, pas de croix, le panneau s'ouvre seul.

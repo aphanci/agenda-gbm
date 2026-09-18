@@ -43,9 +43,29 @@
   "inscription": {
     "active": true,
 
-    "_a_completer": "Remplacer url et contact avant l'evenement. Tant que url est vide, le formulaire ne s'affiche pas.",
+    "_mode": "formulaire = un formulaire Microsoft Forms dans un cadre. flux = le formulaire maison qui envoie a Power Automate (bloque par la politique de securite, garde pour plus tard).",
+    "mode": "formulaire",
+
+    "_a_completer": "Coller l'adresse du formulaire Microsoft (celle qui contient &embed=true). Tant qu'elle est vide, ni formulaire ni verrou ne s'affichent : le site reste consultable.",
+    "formulaireUrl": "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=wP6iMWsmZ0y1bieW2PWcNjfI8lR4-KtIikWYYV8mp81URFo0NVJCSERNWFY1T0QzWE9HNDhGQkg4Si4u&embed=true",
+
+    "_url": "Pour le jour ou le flux Power Automate sera autorise. Sert uniquement si mode vaut flux.",
     "url": "",
+
     "contact": "[adresse e-mail a completer]",
+
+    "_obligatoire": "true = l'agenda n'est lisible qu'apres enregistrement. false = simple invitation, agenda libre.",
+    "obligatoire": true,
+
+    "_qualites": "Utilisees par le formulaire maison (mode flux). En mode formulaire, les memes six categories sont a saisir dans Microsoft Forms.",
+    "qualites": [
+      { "cle": "etudiant",  "fr": "Étudiant(e) ou élève",                              "en": "Student or pupil" },
+      { "cle": "ministere", "fr": "Ministère ou administration",                        "en": "Ministry or public administration" },
+      { "cle": "projet",    "fr": "Projet financé par la Banque mondiale",              "en": "World Bank–financed project" },
+      { "cle": "ptf",       "fr": "Partenaire technique et financier",                  "en": "Technical and financial partner" },
+      { "cle": "prive",     "fr": "Entreprise, presse ou société civile",               "en": "Company, press or civil society" },
+      { "cle": "autre",     "fr": "Autre visiteur",                                     "en": "Other visitor", "champLibre": true }
+    ],
 
     "responsable": {
       "fr": "le bureau de la Banque mondiale en Côte d'Ivoire",

@@ -119,18 +119,48 @@
           <button class="panneau-x" id="formFermer" type="button"></button>
         </header>
 
+        <!-- Mode « formulaire Microsoft » : ton introduction et ton avis,
+             puis le formulaire de Microsoft dans un cadre. -->
+        <div class="cadre-zone" id="cadreZone" hidden>
+          <p class="form-intro" id="cadreIntro"></p>
+
+          <section class="avis">
+            <h3 id="cadreAvisTitre"></h3>
+            <p id="cadreAvisTexte"></p>
+          </section>
+
+          <div class="cadre-boite">
+            <iframe id="cadreForm" title="" loading="lazy"
+                    allow="fullscreen" referrerpolicy="no-referrer"></iframe>
+          </div>
+
+          <button type="button" class="form-envoyer" id="cadreTermine"></button>
+          <p class="form-note" id="cadreNote"></p>
+        </div>
+
         <form class="form" id="formInscription" novalidate>
           <p class="form-intro" id="formIntro"></p>
 
-          <label class="champ">
-            <span class="champ-nom" id="labNom"></span>
-            <input type="text" id="fNom" name="nom" autocomplete="name" required>
-          </label>
+          <div class="duo">
+            <label class="champ">
+              <span class="champ-nom" id="labNom"></span>
+              <input type="text" id="fNom" name="nom" autocomplete="family-name" required>
+            </label>
+
+            <label class="champ">
+              <span class="champ-nom" id="labPrenom"></span>
+              <input type="text" id="fPrenom" name="prenom" autocomplete="given-name" required>
+            </label>
+          </div>
 
           <label class="champ">
             <span class="champ-nom" id="labQualite"></span>
-            <input type="text" id="fQualite" name="qualite" autocomplete="organization-title" required>
-            <span class="champ-aide" id="aideQualite"></span>
+            <select id="fQualite" name="qualite" required></select>
+          </label>
+
+          <label class="champ" id="champAutre" hidden>
+            <span class="champ-nom" id="labAutre"></span>
+            <input type="text" id="fAutre" name="autre">
           </label>
 
           <label class="champ">
