@@ -18,18 +18,31 @@
    Le reste du fichier n'utilise que var(--nom) : pour changer
    la charte, il n'y a que ce bloc à modifier. */
 :root {
-  --papier:      #EEF1F5;
+  --papier:      #F4F7FB;
   --surface:     #FFFFFF;
-  --surface-2:   #F7F9FB;
+  --surface-2:   #EDF2F8;
   --encre:       #0C2340;
-  --encre-2:     #33507A;
-  --encre-3:     #69809D;
-  --filet:       #D2DCE7;
-  --filet-doux:  #E3EAF1;
+  --encre-2:     #3A5578;
+  --encre-3:     #7389A6;
+  --filet:       #DCE4EE;
+  --filet-doux:  #EAF0F6;
   --accent:      #B85C00;
-  --accent-fond: #FBF0E2;
+  --accent-fond: #FCF2E5;
   --direct-fond: #B85C00;
   --direct-texte:#FFFFFF;
+
+  /* Le bandeau de l'événement. Ses couleurs sont des tokens à part :
+     en thème clair il est lumineux, en thème sombre il est sombre,
+     mais la règle du composant, elle, ne change jamais. */
+  --bandeau-fond:   #F7F9FC;
+  --bandeau-titre:  #0C2340;
+  --bandeau-texte:  #3A5578;
+  --bandeau-accent: #B85C00;
+
+  /* Le bouton flottant « Aller à maintenant ». */
+  --flottant-fond:  #0C2340;
+  --flottant-texte: #FFFFFF;
+
   --ombre: 0 1px 2px rgba(12,35,64,.06), 0 8px 24px -12px rgba(12,35,64,.24);
 
   --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
@@ -52,6 +65,15 @@
     --accent-fond: #1E2F36;
     --direct-fond: #F5A95A;
     --direct-texte:#0A1826;
+
+    --bandeau-fond:   #0F2536;
+    --bandeau-titre:  #E7EEF5;
+    --bandeau-texte:  #AAC0D4;
+    --bandeau-accent: #F5A95A;
+
+    --flottant-fond:  #E7EEF5;
+    --flottant-texte: #0A1826;
+
     --ombre: 0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
   }
 }
@@ -68,6 +90,15 @@
   --accent-fond: #1E2F36;
   --direct-fond: #F5A95A;
   --direct-texte:#0A1826;
+
+  --bandeau-fond:   #0F2536;
+  --bandeau-titre:  #E7EEF5;
+  --bandeau-texte:  #AAC0D4;
+  --bandeau-accent: #F5A95A;
+
+  --flottant-fond:  #E7EEF5;
+  --flottant-texte: #0A1826;
+
   --ombre: 0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
 }
 
@@ -99,20 +130,21 @@ img { max-width: 100%; }
 
 /* ---------- 3. LE BANDEAU DE L'ÉVÉNEMENT ---------- */
 .masthead {
-  background: var(--encre);
-  color: #fff;
+  background: var(--bandeau-fond);
+  color: var(--bandeau-titre);
   margin-inline: -16px;
   padding: 20px 16px 18px;
   position: relative;
+  border-bottom: 3px solid var(--bandeau-accent);
 }
 .masthead .eyebrow {
   margin: 0 0 9px;
   padding-right: 74px;
   font-size: 10.5px;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: .15em;
   text-transform: uppercase;
-  color: #9FB6D0;
+  color: var(--bandeau-accent);
 }
 .masthead h1 {
   margin: 0;
@@ -120,16 +152,17 @@ img { max-width: 100%; }
   font-size: clamp(20px, 5.2vw, 27px);
   font-weight: 700;
   line-height: 1.18;
-  color: #fff;
+  color: var(--bandeau-titre);
   text-wrap: balance;
 }
+.masthead h1 em { font-style: italic; color: var(--bandeau-accent); }
 .masthead .meta {
   margin-top: 12px;
   display: flex;
   flex-direction: column;
   gap: 4px;
   font-size: 12.5px;
-  color: #BCD0E4;
+  color: var(--bandeau-texte);
 }
 
 .langsw {
@@ -137,7 +170,7 @@ img { max-width: 100%; }
   top: 18px;
   right: 16px;
   display: flex;
-  border: 1px solid rgba(255,255,255,.28);
+  border: 1px solid var(--filet);
   border-radius: 5px;
   overflow: hidden;
 }
@@ -151,9 +184,14 @@ img { max-width: 100%; }
   font-size: 11px;
   font-weight: 700;
   letter-spacing: .06em;
-  color: #BCD0E4;
+  color: var(--encre-3);
 }
-.langsw button[aria-pressed="true"] { background: #F5A95A; color: #0C2340; }
+/* Le bouton actif reprend le couple fond/texte déjà vérifié
+   pour l'état « en cours » : lisible dans les deux thèmes. */
+.langsw button[aria-pressed="true"] {
+  background: var(--direct-fond);
+  color: var(--direct-texte);
+}
 
 /* ---------- 4. L'ANNONCE ---------- */
 .annonce {
@@ -559,8 +597,8 @@ img { max-width: 100%; }
   appearance: none;
   border: 0;
   cursor: pointer;
-  background: var(--encre);
-  color: #fff;
+  background: var(--flottant-fond);
+  color: var(--flottant-texte);
   border-radius: 999px;
   padding: 9px 16px;
   padding-bottom: calc(9px + env(safe-area-inset-bottom, 0px));
@@ -572,7 +610,7 @@ img { max-width: 100%; }
   font-size: 12.5px;
   font-weight: 600;
 }
-.jump i { display: block; width: 6px; height: 6px; border-radius: 50%; background: #F5A95A; }
+.jump i { display: block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
 
 /* Quand le bandeau d'installation occupe le bas de l'écran,
    le bouton « maintenant » remonte au lieu de passer dessous. */
