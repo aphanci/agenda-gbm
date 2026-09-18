@@ -43,6 +43,22 @@
   --flottant-fond:  #0C2340;
   --flottant-texte: #FFFFFF;
 
+  /* Le bandeau d'installation, posé au-dessus de la page.
+     Il lui faut ses PROPRES tokens : il utilisait --encre comme fond,
+     or --encre est la couleur de l'encre. En thème sombre l'encre
+     devient presque blanche — le bandeau passait en blanc sur blanc. */
+  --install-fond:       #0C2340;
+  --install-titre:      #FFFFFF;
+  --install-detail:     #BCD0E4;
+  --install-x:          #8FA8C2;
+  --install-go-fond:    #F5A95A;
+  --install-go-texte:   #0C2340;
+  --install-ico-fond:   rgba(245, 169, 90, .16);
+  --install-ico-texte:  #F5A95A;
+
+  /* Le voile derrière le panneau plein écran. */
+  --voile: rgba(12, 35, 64, .55);
+
   --ombre: 0 1px 2px rgba(12,35,64,.06), 0 8px 24px -12px rgba(12,35,64,.24);
 
   --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
@@ -74,6 +90,20 @@
     --flottant-fond:  #E7EEF5;
     --flottant-texte: #0A1826;
 
+    /* En thème sombre, le bandeau ne s'éclaircit pas : il se DÉTACHE.
+       Son fond est plus clair que la page (#0A1826) tout en restant
+       sombre, ce qui le fait flotter au lieu de trancher. */
+    --install-fond:       #16314B;
+    --install-titre:      #F2F7FC;
+    --install-detail:     #AEC4D8;
+    --install-x:          #93AAC4;
+    --install-go-fond:    #F5A95A;
+    --install-go-texte:   #0A1826;
+    --install-ico-fond:   rgba(245, 169, 90, .20);
+    --install-ico-texte:  #F5A95A;
+
+    --voile: rgba(2, 10, 20, .72);
+
     --ombre: 0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
   }
 }
@@ -98,6 +128,20 @@
 
   --flottant-fond:  #E7EEF5;
   --flottant-texte: #0A1826;
+
+  /* En thème sombre, le bandeau ne s'éclaircit pas : il se DÉTACHE.
+     Son fond est plus clair que la page (#0A1826) tout en restant
+     sombre, ce qui le fait flotter au lieu de trancher. */
+  --install-fond:       #16314B;
+  --install-titre:      #F2F7FC;
+  --install-detail:     #AEC4D8;
+  --install-x:          #93AAC4;
+  --install-go-fond:    #F5A95A;
+  --install-go-texte:   #0A1826;
+  --install-ico-fond:   rgba(245, 169, 90, .20);
+  --install-ico-texte:  #F5A95A;
+
+  --voile: rgba(2, 10, 20, .72);
 
   --ombre: 0 1px 2px rgba(0,0,0,.4), 0 10px 28px -14px rgba(0,0,0,.7);
 }
@@ -668,8 +712,8 @@ body.avec-install .jump { margin-bottom: 92px; }
   gap: 12px;
   padding: 13px 16px;
   padding-bottom: calc(13px + env(safe-area-inset-bottom, 0px));
-  background: var(--encre);
-  color: #fff;
+  background: var(--install-fond);
+  color: var(--install-titre);
   box-shadow: 0 -6px 24px -10px rgba(0, 0, 0, .55);
 }
 .install-ico {
@@ -678,8 +722,8 @@ body.avec-install .jump { margin-bottom: 92px; }
   display: grid;
   place-items: center;
   border-radius: 8px;
-  background: rgba(245, 169, 90, .16);
-  color: #F5A95A;
+  background: var(--install-ico-fond);
+  color: var(--install-ico-texte);
 }
 .install-ico svg { width: 19px; height: 19px; display: block; }
 
@@ -689,13 +733,13 @@ body.avec-install .jump { margin-bottom: 92px; }
   font-size: 13.5px;
   font-weight: 600;
   line-height: 1.3;
-  color: #fff;
+  color: var(--install-titre);
 }
 .install-detail {
   margin: 2px 0 0;
   font-size: 11.5px;
   line-height: 1.4;
-  color: #BCD0E4;
+  color: var(--install-detail);
 }
 
 .install-go {
@@ -703,8 +747,8 @@ body.avec-install .jump { margin-bottom: 92px; }
   appearance: none;
   border: 0;
   cursor: pointer;
-  background: #F5A95A;
-  color: #0C2340;
+  background: var(--install-go-fond);
+  color: var(--install-go-texte);
   border-radius: 6px;
   padding: 9px 15px;
   font-family: var(--sans);
@@ -717,13 +761,13 @@ body.avec-install .jump { margin-bottom: 92px; }
   border: 0;
   cursor: pointer;
   background: none;
-  color: #8FA8C2;
+  color: var(--install-x);
   font-size: 15px;
   line-height: 1;
   padding: 8px;
   border-radius: 6px;
 }
-.install-x:hover { color: #fff; }
+.install-x:hover { color: var(--install-titre); }
 
 /* Sur un écran étroit, le bouton passe sous le texte
    plutôt que de comprimer les deux. */
@@ -788,7 +832,7 @@ body.avec-install .jump { margin-bottom: 92px; }
   position: fixed;
   inset: 0;
   z-index: 60;
-  background: rgba(12, 35, 64, .55);
+  background: var(--voile);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: 0;

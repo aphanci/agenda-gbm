@@ -26,7 +26,7 @@
 /* Le numéro de version. À INCRÉMENTER à chaque modification d'un
    fichier : c'est ce qui force les navigateurs à reprendre la
    nouvelle version au lieu de servir l'ancienne indéfiniment. */
-const VERSION = "agenda-v11";
+const VERSION = "agenda-v12";
 
 /* Les fichiers mis en réserve dès l'installation. */
 const FICHIERS = [
