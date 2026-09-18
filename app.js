@@ -65,9 +65,12 @@
       inscrireMasquer: "Masquer",
       formTitre: "Enregistrement des participants",
       formIntro: "Quatre informations, et vous recevrez les documents de l'événement. Les champs marqués d'une étoile sont nécessaires.",
-      labNom: "Nom et prénom *",
-      labQualite: "Qualité ou fonction *",
-      aideQualite: "Par exemple : chef de projet, étudiante, journaliste, agent public.",
+      formIntroVerrou: "Merci de vous enregistrer pour accéder au programme. Quelques secondes, et vous recevrez aussi les documents de l'événement.",
+      labNom: "Nom *",
+      labPrenom: "Prénom *",
+      labQualite: "Vous êtes *",
+      labQualiteVide: "— Choisissez —",
+      labAutre: "Précisez *",
       labOrganisation: "Organisation",
       labEmail: "Adresse e-mail *",
       avisTitre: "Ce que deviennent vos informations",
@@ -79,8 +82,10 @@
       merciTitre: "C'est enregistré",
       merciTexte: "Merci. Vous recevrez les documents de l'événement à l'adresse indiquée.",
       merciFermer: "Revenir à l'agenda",
-      errNom: "Merci d'indiquer votre nom et votre prénom.",
-      errQualite: "Merci d'indiquer votre qualité ou votre fonction.",
+      errNom: "Merci d'indiquer votre nom.",
+      errPrenom: "Merci d'indiquer votre prénom.",
+      errQualite: "Merci de choisir dans la liste.",
+      errAutre: "Merci de préciser.",
       errEmail: "Cette adresse e-mail ne semble pas valide.",
       errConsent: "Merci de cocher la case pour poursuivre.",
       errReseau: "L'envoi n'a pas abouti. Vos informations sont conservées sur cet appareil et repartiront automatiquement dès que le réseau reviendra.",
@@ -127,9 +132,12 @@
       inscrireMasquer: "Dismiss",
       formTitre: "Participant registration",
       formIntro: "Four details, and you will receive the event's documents. Fields marked with a star are required.",
-      labNom: "Full name *",
-      labQualite: "Role or job title *",
-      aideQualite: "For example: project manager, student, journalist, civil servant.",
+      formIntroVerrou: "Please register to view the programme. It takes a few seconds, and you will also receive the event's documents.",
+      labNom: "Surname *",
+      labPrenom: "First name *",
+      labQualite: "You are *",
+      labQualiteVide: "— Please choose —",
+      labAutre: "Please specify *",
       labOrganisation: "Organisation",
       labEmail: "Email address *",
       avisTitre: "What happens to your information",
@@ -141,8 +149,10 @@
       merciTitre: "You're registered",
       merciTexte: "Thank you. You will receive the event's documents at the address you gave.",
       merciFermer: "Back to the agenda",
-      errNom: "Please give your full name.",
-      errQualite: "Please give your role or job title.",
+      errNom: "Please give your surname.",
+      errPrenom: "Please give your first name.",
+      errQualite: "Please choose from the list.",
+      errAutre: "Please specify.",
       errEmail: "That email address does not look valid.",
       errConsent: "Please tick the box to continue.",
       errReseau: "The submission did not go through. Your details are kept on this device and will be sent automatically once the network is back.",
@@ -793,6 +803,18 @@
     try { return localStorage.getItem(CLE_INSCRIRE_MASQUE) === "1"; } catch (e) { return false; }
   }
 
+  /* Un identifiant unique par inscription.
+     Il sert de filet : si un envoi part deux fois — le cas peut
+     arriver quand le navigateur n'arrive pas à lire la réponse du
+     serveur alors que celui-ci a bien reçu — deux lignes portent
+     le même identifiant, et se repèrent d'un coup d'œil dans Excel. */
+  function identifiant() {
+    try {
+      if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    } catch (e) { }
+    return "id-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 10);
+  }
+
   function lireAttente() {
     try {
       var brut = localStorage.getItem(CLE_ATTENTE);
@@ -817,20 +839,30 @@
       .catch(function () { return false; });
   }
 
-  /* Au chargement, on retente ce qui n'était pas parti. */
+  /* Au chargement, on retente ce qui n'était pas parti.
+     Trois tentatives au maximum, puis on abandonne : si le serveur
+     reçoit bien mais que le navigateur n'arrive pas à lire sa réponse,
+     réessayer indéfiniment créerait une ligne de plus à chaque
+     ouverture de l'application. Trois bornes le dégât. */
+  var ESSAIS_MAX = 3;
+
   function viderLaFileDAttente() {
     var attente = lireAttente();
     if (!attente.length) return;
 
     var restant = [];
     var suite = Promise.resolve();
+
     attente.forEach(function (d) {
       suite = suite.then(function () {
         return envoyerInscription(d).then(function (ok) {
-          if (!ok) restant.push(d);
+          if (ok) return;
+          d.essais = (d.essais || 0) + 1;
+          if (d.essais < ESSAIS_MAX) restant.push(d);
         });
       });
     });
+
     suite.then(function () { ecrireAttente(restant); });
   }
 
@@ -838,6 +870,40 @@
     // Volontairement permissif : refuser une adresse valide est pire
     // que d'en accepter une douteuse, qu'un humain verra dans la feuille.
     return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+  }
+
+  /* Le verrou : l'agenda n'est lisible qu'une fois enregistré.
+     Il ne s'active que si les données le demandent ET qu'une adresse
+     d'envoi existe — sans quoi on enfermerait les visiteurs dehors
+     sans pouvoir enregistrer personne. */
+  function verrouActif() {
+    var conf = PROGRAMME.inscription;
+    return !!(conf && conf.active === true && conf.url && conf.obligatoire === true);
+  }
+
+  /* Remplit la liste déroulante des qualités à partir des données. */
+  function peindreQualites() {
+    var T = UI[LANGUE];
+    var conf = PROGRAMME.inscription || {};
+    var liste = conf.qualites || [];
+    var select = $("fQualite");
+    var choisi = select.value;
+
+    select.innerHTML = '<option value="">' + echapper(T.labQualiteVide) + "</option>"
+      + liste.map(function (q) {
+          return '<option value="' + echapper(q.cle) + '">' + echapper(q[LANGUE] || q.fr) + "</option>";
+        }).join("");
+
+    if (choisi) select.value = choisi;   // on garde le choix au changement de langue
+  }
+
+  /* La qualité choisie demande-t-elle une précision libre ? */
+  function qualiteDemandePrecision(cle) {
+    var liste = (PROGRAMME.inscription || {}).qualites || [];
+    for (var i = 0; i < liste.length; i++) {
+      if (liste[i].cle === cle) return liste[i].champLibre === true;
+    }
+    return false;
   }
 
   function peindreFormulaire() {
@@ -851,10 +917,12 @@
     $("inscrireMasquer").setAttribute("aria-label", T.inscrireMasquer);
 
     $("formTitre").textContent = T.formTitre;
-    $("formIntro").textContent = T.formIntro;
+    $("formIntro").textContent = verrouActif() ? T.formIntroVerrou : T.formIntro;
     $("labNom").textContent = T.labNom;
+    $("labPrenom").textContent = T.labPrenom;
     $("labQualite").textContent = T.labQualite;
-    $("aideQualite").textContent = T.aideQualite;
+    $("labAutre").textContent = T.labAutre;
+    peindreQualites();
     $("labOrganisation").textContent = T.labOrganisation;
     $("labEmail").textContent = T.labEmail;
     $("labConsent").textContent = T.labConsent;
@@ -875,25 +943,40 @@
     var duree = (conf.conservation && conf.conservation[LANGUE]) || "";
     var contact = conf.contact || "";
 
+    /* L'avis doit dire la vérité sur le caractère facultatif : avec le
+       verrou, le formulaire ne l'est plus. Une contradiction ici, et
+       c'est tout l'avis qui perd sa valeur. */
+    var verrou = verrouActif();
+
     if (LANGUE === "fr") {
       $("avisTexte").textContent =
-        "Votre nom, votre fonction, votre organisation et votre adresse e-mail sont "
+        "Vos nom, prénom, qualité, organisation et adresse e-mail sont "
         + "collectés par " + resp + ", dans le seul but de " + fin + ". "
         + "Ils ne sont ni vendus, ni cédés à des tiers, ni utilisés à d'autres fins. "
         + "Ils sont conservés " + duree + ", puis supprimés.";
       $("avisDroits").textContent =
-        "Ce formulaire est facultatif. Vous pouvez demander à consulter, corriger ou "
-        + "supprimer vos informations à tout moment en écrivant à " + contact + ".";
+        (verrou
+          ? "L'accès au programme suppose cet enregistrement. "
+          : "Ce formulaire est facultatif. ")
+        + "Vous pouvez demander à consulter, corriger ou supprimer vos informations "
+        + "à tout moment en écrivant à " + contact + ".";
     } else {
       $("avisTexte").textContent =
-        "Your name, role, organisation and email address are collected by " + resp
-        + ", for the sole purpose of " + fin + ". "
+        "Your surname, first name, role, organisation and email address are collected by "
+        + resp + ", for the sole purpose of " + fin + ". "
         + "They are never sold, passed to third parties, or used for anything else. "
         + "They are kept " + duree + ", then deleted.";
       $("avisDroits").textContent =
-        "This form is optional. You may ask to see, correct or delete your information "
-        + "at any time by writing to " + contact + ".";
+        (verrou
+          ? "Access to the programme requires this registration. "
+          : "This form is optional. ")
+        + "You may ask to see, correct or delete your information at any time "
+        + "by writing to " + contact + ".";
     }
+
+    // Même exigence pour la note sous le bouton d'envoi.
+    $("formNote").textContent = verrou ? "" : T.formNote;
+    $("formNote").hidden = verrou;
   }
 
   function montrerBandeauInscrire() {
@@ -910,6 +993,8 @@
     window.setTimeout(function () { $("fNom").focus(); }, 80);
   }
   function fermerPanneau() {
+    // Tant que le verrou est actif et l'inscription non faite, on ne sort pas.
+    if (verrouActif() && !estInscrit()) return;
     $("inscrirePanneau").hidden = true;
     document.body.style.overflow = "";
   }
@@ -918,11 +1003,22 @@
     var conf = PROGRAMME.inscription;
     if (!conf || conf.active !== true || !conf.url) return;
 
+    var verrou = verrouActif();
+
     peindreFormulaire();
-    montrerBandeauInscrire();
     viderLaFileDAttente();
 
-    $("inscrireOuvrir").addEventListener("click", ouvrirPanneau);
+    if (verrou) {
+      // Mode verrou : pas de bandeau, pas de croix, le panneau s'ouvre seul.
+      $("inscrireBandeau").hidden = true;
+      $("formFermer").hidden = true;
+      document.body.classList.add("verrouille");
+      if (!estInscrit()) ouvrirPanneau();
+    } else {
+      montrerBandeauInscrire();
+      $("inscrireOuvrir").addEventListener("click", ouvrirPanneau);
+    }
+
     $("formFermer").addEventListener("click", fermerPanneau);
     $("merciFermer").addEventListener("click", fermerPanneau);
 
@@ -935,14 +1031,30 @@
       if (e.key === "Escape" && !$("inscrirePanneau").hidden) fermerPanneau();
     });
 
+    // Le champ « Précisez » n'apparaît que si la qualité choisie le demande.
+    $("fQualite").addEventListener("change", function () {
+      $("champAutre").hidden = !qualiteDemandePrecision(this.value);
+    });
+
     $("formInscription").addEventListener("submit", function (e) {
       e.preventDefault();
       var T = UI[LANGUE];
       var err = $("formErreur");
 
+      var cleQualite = $("fQualite").value;
+      var precision = $("fAutre").value.trim();
+      var libelle = "";
+      ((PROGRAMME.inscription || {}).qualites || []).forEach(function (q) {
+        if (q.cle === cleQualite) libelle = q.fr;   // toujours en français dans la feuille
+      });
+
       var d = {
+        id: identifiant(),
         nom: $("fNom").value.trim(),
-        qualite: $("fQualite").value.trim(),
+        prenom: $("fPrenom").value.trim(),
+        qualite: libelle,
+        qualiteCle: cleQualite,
+        precision: precision,
         organisation: $("fOrganisation").value.trim(),
         email: $("fEmail").value.trim(),
         langue: LANGUE,
@@ -951,7 +1063,9 @@
       };
 
       var probleme = !d.nom ? T.errNom
-                   : !d.qualite ? T.errQualite
+                   : !d.prenom ? T.errPrenom
+                   : !cleQualite ? T.errQualite
+                   : (qualiteDemandePrecision(cleQualite) && !precision) ? T.errAutre
                    : !emailPlausible(d.email) ? T.errEmail
                    : !d.consentement ? T.errConsent
                    : null;
@@ -976,14 +1090,20 @@
           $("inscrireBandeau").hidden = true;
           $("formInscription").hidden = true;
           $("formMerci").hidden = false;
+          $("formFermer").hidden = false;
+          document.body.classList.remove("verrouille");
           return;
         }
 
-        // Échec : on garde, on repartira au prochain chargement.
+        /* Échec réseau. On garde l'inscription pour la renvoyer plus tard,
+           ET on laisse entrer : dans une salle saturée, refuser l'accès
+           à quelqu'un qui vient de remplir le formulaire serait absurde. */
         var attente = lireAttente();
         attente.push(d);
         ecrireAttente(attente);
         noterInscrit();
+        $("formFermer").hidden = false;
+        document.body.classList.remove("verrouille");
         err.textContent = T.errReseau;
         err.hidden = false;
       });

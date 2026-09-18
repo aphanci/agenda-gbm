@@ -26,7 +26,7 @@
 /* Le numéro de version. À INCRÉMENTER à chaque modification d'un
    fichier : c'est ce qui force les navigateurs à reprendre la
    nouvelle version au lieu de servir l'ancienne indéfiniment. */
-const VERSION = "agenda-v4";
+const VERSION = "agenda-v7";
 
 /* Les fichiers mis en réserve dès l'installation. */
 const FICHIERS = [
@@ -78,12 +78,22 @@ self.addEventListener("fetch", (evenement) => {
   const chemin = new URL(requete.url).pathname;
 
   /* ===== STRATÉGIE 1 : RÉSEAU D'ABORD =====
-     Pour l'annonce uniquement.
+     Pour les DONNÉES : l'annonce et le programme.
+
      On tente le réseau ; s'il répond, on sert sa réponse ET on la
      range en réserve. S'il ne répond pas, on sert la dernière version
-     connue. Résultat : l'annonce est toujours aussi fraîche que
-     possible, sans jamais empêcher la page de fonctionner. */
-  if (chemin.endsWith("annonce.json")) {
+     connue. Résultat : les données sont toujours aussi fraîches que
+     possible, sans jamais empêcher la page de fonctionner hors réseau.
+
+     Pourquoi le programme est ici et non en cache d'abord : un agenda
+     qui change la veille — ou une adresse d'inscription qu'on active
+     le matin même — doit atteindre les téléphones qui ont DÉJÀ ouvert
+     l'application. En cache d'abord, ils garderaient l'ancienne version
+     jusqu'au prochain changement de numéro de version, et personne ne
+     comprendrait pourquoi. Le coût est de quelques dizaines de
+     millisecondes au chargement ; le bénéfice est de ne jamais afficher
+     un programme faux. */
+  if (chemin.endsWith("annonce.json") || chemin.endsWith("programme.json")) {
     evenement.respondWith(
       fetch(requete)
         .then((reponse) => {
