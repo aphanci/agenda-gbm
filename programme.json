@@ -52,7 +52,7 @@
     "_url": "Pour le jour ou le flux Power Automate sera autorise. Sert uniquement si mode vaut flux.",
     "url": "",
 
-    "contact": "[adresse e-mail a completer]",
+    "contact": "mkouabenan@worldbank.org",
 
     "_obligatoire": "true = l'agenda n'est lisible qu'apres enregistrement. false = simple invitation, agenda libre.",
     "obligatoire": true,

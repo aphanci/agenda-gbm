@@ -983,7 +983,8 @@
 
     if (LANGUE === "fr") {
       $("avisTexte").textContent =
-        "Vos nom, prénom, qualité, organisation et adresse e-mail sont "
+        "Vos nom, prénom, qualité et organisation — ainsi que votre adresse "
+        + "e-mail si vous choisissez de la donner — sont "
         + "collectés par " + resp + ", dans le seul but de " + fin + ". "
         + "Ils ne sont ni vendus, ni cédés à des tiers, ni utilisés à d'autres fins. "
         + "Ils sont conservés " + duree + ", puis supprimés.";
@@ -995,7 +996,8 @@
         + "à tout moment en écrivant à " + contact + ".";
     } else {
       $("avisTexte").textContent =
-        "Your surname, first name, role, organisation and email address are collected by "
+        "Your surname, first name, role and organisation — and your email "
+        + "address if you choose to provide it — are collected by "
         + resp + ", for the sole purpose of " + fin + ". "
         + "They are never sold, passed to third parties, or used for anything else. "
         + "They are kept " + duree + ", then deleted.";
@@ -1074,12 +1076,29 @@
       viderLaFileDAttente();
     }
 
-    if (verrou) {
-      // Mode verrou : pas de bandeau, pas de croix, le panneau s'ouvre seul.
+    if (verrou && !estInscrit()) {
+      // Verrou actif ET visiteur inconnu : pas de bandeau, pas de croix,
+      // le panneau s'ouvre seul et la page ne défile pas derrière.
       $("inscrireBandeau").hidden = true;
       $("formFermer").hidden = true;
       document.body.classList.add("verrouille");
-      if (!estInscrit()) ouvrirPanneau();
+      ouvrirPanneau();
+
+    } else if (verrou) {
+      /* Verrou actif, mais le visiteur s'est DÉJÀ enregistré.
+         Il ne doit plus rien voir du dispositif : ni bandeau, ni panneau,
+         ni blocage du défilement.
+
+         C'est le cas qui manquait. Le verrou était posé sur le corps de
+         la page sans que le panneau ne s'ouvre : le visiteur retrouvait
+         son agenda figé sur le premier écran, impossible à faire défiler,
+         et sans rien à quoi répondre pour s'en sortir. Le défaut est
+         resté invisible tant que l'adresse du formulaire était vide,
+         parce que le verrou ne s'activait pas du tout. */
+      $("inscrireBandeau").hidden = true;
+      $("formFermer").hidden = false;
+      document.body.classList.remove("verrouille");
+
     } else {
       montrerBandeauInscrire();
       $("inscrireOuvrir").addEventListener("click", ouvrirPanneau);
