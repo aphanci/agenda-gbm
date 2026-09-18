@@ -57,7 +57,34 @@
       installDetail: "Un geste pour l'ouvrir, et il fonctionne sans réseau.",
       installBouton: "Installer",
       installIOS: "Touchez ⬆︎ en bas de l'écran, puis « Sur l'écran d'accueil ».",
-      installFermer: "Masquer"
+      installFermer: "Masquer",
+
+      inscrireTitre: "Vous participez à l'événement ?",
+      inscrireDetail: "Enregistrez-vous pour recevoir les documents et les suites.",
+      inscrireBouton: "S'enregistrer",
+      inscrireMasquer: "Masquer",
+      formTitre: "Enregistrement des participants",
+      formIntro: "Quatre informations, et vous recevrez les documents de l'événement. Les champs marqués d'une étoile sont nécessaires.",
+      labNom: "Nom et prénom *",
+      labQualite: "Qualité ou fonction *",
+      aideQualite: "Par exemple : chef de projet, étudiante, journaliste, agent public.",
+      labOrganisation: "Organisation",
+      labEmail: "Adresse e-mail *",
+      avisTitre: "Ce que deviennent vos informations",
+      labConsent: "J'ai lu ce qui précède et j'accepte que mes informations soient utilisées dans ce cadre.",
+      formEnvoyer: "Envoyer",
+      formEnvoi: "Envoi en cours…",
+      formNote: "Ce formulaire est facultatif. Vous pouvez consulter l'agenda sans vous enregistrer.",
+      formFermer: "Fermer",
+      merciTitre: "C'est enregistré",
+      merciTexte: "Merci. Vous recevrez les documents de l'événement à l'adresse indiquée.",
+      merciFermer: "Revenir à l'agenda",
+      errNom: "Merci d'indiquer votre nom et votre prénom.",
+      errQualite: "Merci d'indiquer votre qualité ou votre fonction.",
+      errEmail: "Cette adresse e-mail ne semble pas valide.",
+      errConsent: "Merci de cocher la case pour poursuivre.",
+      errReseau: "L'envoi n'a pas abouti. Vos informations sont conservées sur cet appareil et repartiront automatiquement dès que le réseau reviendra.",
+      dejaInscrit: "Vous êtes enregistré"
     },
     en: {
       ouvreDans: "Opens in", ouvertureTitre: "Start of the event",
@@ -92,7 +119,34 @@
       installDetail: "One tap to open it, and it works offline.",
       installBouton: "Install",
       installIOS: "Tap ⬆︎ at the bottom of the screen, then “Add to Home Screen”.",
-      installFermer: "Dismiss"
+      installFermer: "Dismiss",
+
+      inscrireTitre: "Attending the event?",
+      inscrireDetail: "Register to receive the event's documents and follow-up.",
+      inscrireBouton: "Register",
+      inscrireMasquer: "Dismiss",
+      formTitre: "Participant registration",
+      formIntro: "Four details, and you will receive the event's documents. Fields marked with a star are required.",
+      labNom: "Full name *",
+      labQualite: "Role or job title *",
+      aideQualite: "For example: project manager, student, journalist, civil servant.",
+      labOrganisation: "Organisation",
+      labEmail: "Email address *",
+      avisTitre: "What happens to your information",
+      labConsent: "I have read the above and agree that my information may be used for this purpose.",
+      formEnvoyer: "Send",
+      formEnvoi: "Sending…",
+      formNote: "This form is optional. You can use the agenda without registering.",
+      formFermer: "Close",
+      merciTitre: "You're registered",
+      merciTexte: "Thank you. You will receive the event's documents at the address you gave.",
+      merciFermer: "Back to the agenda",
+      errNom: "Please give your full name.",
+      errQualite: "Please give your role or job title.",
+      errEmail: "That email address does not look valid.",
+      errConsent: "Please tick the box to continue.",
+      errReseau: "The submission did not go through. Your details are kept on this device and will be sent automatically once the network is back.",
+      dejaInscrit: "You are registered"
     }
   };
 
@@ -705,6 +759,238 @@
   }
 
   /* ============================================================
+     L'ENREGISTREMENT DES PARTICIPANTS
+     ============================================================
+     Le formulaire envoie ses réponses à un petit script Google,
+     qui les écrit dans une feuille de calcul. GitHub Pages ne sait
+     que SERVIR des fichiers : il ne peut rien recevoir. Il faut
+     donc un destinataire ailleurs.
+
+     Deux précautions valent d'être comprises :
+
+     • L'envoi part en "text/plain". C'est volontaire : avec ce
+       type, le navigateur envoie directement, sans demander
+       d'autorisation préalable au serveur. Avec "application/json"
+       il enverrait d'abord une requête OPTIONS, à laquelle les
+       scripts Google ne répondent pas — et l'envoi échouerait.
+
+     • Un envoi qui échoue n'est pas perdu : il est gardé sur
+       l'appareil et repart au chargement suivant. Dans une salle
+       où 400 personnes saturent le wifi, c'est la différence
+       entre perdre des inscriptions et n'en perdre aucune.
+     ============================================================ */
+  var CLE_INSCRIT = "agenda-inscrit";
+  var CLE_ATTENTE = "agenda-inscription-attente";
+  var CLE_INSCRIRE_MASQUE = "agenda-inscrire-masque";
+
+  function estInscrit() {
+    try { return localStorage.getItem(CLE_INSCRIT) === "1"; } catch (e) { return false; }
+  }
+  function noterInscrit() {
+    try { localStorage.setItem(CLE_INSCRIT, "1"); } catch (e) { }
+  }
+  function inscrireMasque() {
+    try { return localStorage.getItem(CLE_INSCRIRE_MASQUE) === "1"; } catch (e) { return false; }
+  }
+
+  function lireAttente() {
+    try {
+      var brut = localStorage.getItem(CLE_ATTENTE);
+      return brut ? JSON.parse(brut) : [];
+    } catch (e) { return []; }
+  }
+  function ecrireAttente(liste) {
+    try { localStorage.setItem(CLE_ATTENTE, JSON.stringify(liste)); } catch (e) { }
+  }
+
+  /* L'envoi lui-même. Renvoie une promesse vraie/fausse. */
+  function envoyerInscription(donnees) {
+    var conf = PROGRAMME.inscription;
+    if (!conf || !conf.url) return Promise.resolve(false);
+
+    return fetch(conf.url, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(donnees)
+    })
+      .then(function (r) { return r.ok; })
+      .catch(function () { return false; });
+  }
+
+  /* Au chargement, on retente ce qui n'était pas parti. */
+  function viderLaFileDAttente() {
+    var attente = lireAttente();
+    if (!attente.length) return;
+
+    var restant = [];
+    var suite = Promise.resolve();
+    attente.forEach(function (d) {
+      suite = suite.then(function () {
+        return envoyerInscription(d).then(function (ok) {
+          if (!ok) restant.push(d);
+        });
+      });
+    });
+    suite.then(function () { ecrireAttente(restant); });
+  }
+
+  function emailPlausible(v) {
+    // Volontairement permissif : refuser une adresse valide est pire
+    // que d'en accepter une douteuse, qu'un humain verra dans la feuille.
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+  }
+
+  function peindreFormulaire() {
+    var T = UI[LANGUE];
+    var conf = PROGRAMME.inscription || {};
+
+    $("inscrireTitre").textContent = T.inscrireTitre;
+    $("inscrireDetail").textContent = T.inscrireDetail;
+    $("inscrireOuvrir").textContent = T.inscrireBouton;
+    $("inscrireMasquer").textContent = "✕";
+    $("inscrireMasquer").setAttribute("aria-label", T.inscrireMasquer);
+
+    $("formTitre").textContent = T.formTitre;
+    $("formIntro").textContent = T.formIntro;
+    $("labNom").textContent = T.labNom;
+    $("labQualite").textContent = T.labQualite;
+    $("aideQualite").textContent = T.aideQualite;
+    $("labOrganisation").textContent = T.labOrganisation;
+    $("labEmail").textContent = T.labEmail;
+    $("labConsent").textContent = T.labConsent;
+    $("formEnvoyer").textContent = T.formEnvoyer;
+    $("formNote").textContent = T.formNote;
+    $("formFermer").textContent = "✕";
+    $("formFermer").setAttribute("aria-label", T.formFermer);
+    $("merciTitre").textContent = T.merciTitre;
+    $("merciTexte").textContent = T.merciTexte;
+    $("merciFermer").textContent = T.merciFermer;
+
+    /* L'avis de confidentialité est assemblé à partir des données,
+       jamais écrit en dur : le responsable et le contact changent
+       d'un événement à l'autre. */
+    $("avisTitre").textContent = T.avisTitre;
+    var resp = (conf.responsable && conf.responsable[LANGUE]) || "";
+    var fin = (conf.finalite && conf.finalite[LANGUE]) || "";
+    var duree = (conf.conservation && conf.conservation[LANGUE]) || "";
+    var contact = conf.contact || "";
+
+    if (LANGUE === "fr") {
+      $("avisTexte").textContent =
+        "Votre nom, votre fonction, votre organisation et votre adresse e-mail sont "
+        + "collectés par " + resp + ", dans le seul but de " + fin + ". "
+        + "Ils ne sont ni vendus, ni cédés à des tiers, ni utilisés à d'autres fins. "
+        + "Ils sont conservés " + duree + ", puis supprimés.";
+      $("avisDroits").textContent =
+        "Ce formulaire est facultatif. Vous pouvez demander à consulter, corriger ou "
+        + "supprimer vos informations à tout moment en écrivant à " + contact + ".";
+    } else {
+      $("avisTexte").textContent =
+        "Your name, role, organisation and email address are collected by " + resp
+        + ", for the sole purpose of " + fin + ". "
+        + "They are never sold, passed to third parties, or used for anything else. "
+        + "They are kept " + duree + ", then deleted.";
+      $("avisDroits").textContent =
+        "This form is optional. You may ask to see, correct or delete your information "
+        + "at any time by writing to " + contact + ".";
+    }
+  }
+
+  function montrerBandeauInscrire() {
+    var conf = PROGRAMME.inscription;
+    // Pas d'adresse de script : le formulaire n'a nulle part où envoyer.
+    if (!conf || conf.active !== true || !conf.url) return;
+    if (estInscrit() || inscrireMasque()) return;
+    $("inscrireBandeau").hidden = false;
+  }
+
+  function ouvrirPanneau() {
+    $("inscrirePanneau").hidden = false;
+    document.body.style.overflow = "hidden";
+    window.setTimeout(function () { $("fNom").focus(); }, 80);
+  }
+  function fermerPanneau() {
+    $("inscrirePanneau").hidden = true;
+    document.body.style.overflow = "";
+  }
+
+  function preparerInscription() {
+    var conf = PROGRAMME.inscription;
+    if (!conf || conf.active !== true || !conf.url) return;
+
+    peindreFormulaire();
+    montrerBandeauInscrire();
+    viderLaFileDAttente();
+
+    $("inscrireOuvrir").addEventListener("click", ouvrirPanneau);
+    $("formFermer").addEventListener("click", fermerPanneau);
+    $("merciFermer").addEventListener("click", fermerPanneau);
+
+    $("inscrireMasquer").addEventListener("click", function () {
+      try { localStorage.setItem(CLE_INSCRIRE_MASQUE, "1"); } catch (e) { }
+      $("inscrireBandeau").hidden = true;
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && !$("inscrirePanneau").hidden) fermerPanneau();
+    });
+
+    $("formInscription").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var T = UI[LANGUE];
+      var err = $("formErreur");
+
+      var d = {
+        nom: $("fNom").value.trim(),
+        qualite: $("fQualite").value.trim(),
+        organisation: $("fOrganisation").value.trim(),
+        email: $("fEmail").value.trim(),
+        langue: LANGUE,
+        consentement: $("fConsent").checked,
+        envoyeLe: new Date().toISOString()
+      };
+
+      var probleme = !d.nom ? T.errNom
+                   : !d.qualite ? T.errQualite
+                   : !emailPlausible(d.email) ? T.errEmail
+                   : !d.consentement ? T.errConsent
+                   : null;
+
+      if (probleme) {
+        err.textContent = probleme;
+        err.hidden = false;
+        return;
+      }
+      err.hidden = true;
+
+      var bouton = $("formEnvoyer");
+      bouton.disabled = true;
+      bouton.textContent = T.formEnvoi;
+
+      envoyerInscription(d).then(function (ok) {
+        bouton.disabled = false;
+        bouton.textContent = T.formEnvoyer;
+
+        if (ok) {
+          noterInscrit();
+          $("inscrireBandeau").hidden = true;
+          $("formInscription").hidden = true;
+          $("formMerci").hidden = false;
+          return;
+        }
+
+        // Échec : on garde, on repartira au prochain chargement.
+        var attente = lireAttente();
+        attente.push(d);
+        ecrireAttente(attente);
+        noterInscrit();
+        err.textContent = T.errReseau;
+        err.hidden = false;
+      });
+    });
+  }
+
+  /* ============================================================
      LE BOUTON « ALLER À MAINTENANT »
      ============================================================ */
   function noeudCible() {
@@ -783,6 +1069,7 @@
 
       majAnnonce();
       preparerInstall();
+      preparerInscription();
       setInterval(majAnnonce, 3 * 60 * 1000);   // l'annonce, toutes les 3 minutes
       setInterval(rafraichir, 1000);            // l'horloge, chaque seconde
 
@@ -831,6 +1118,8 @@
     if (!$("install").hidden) {
       montrerBandeauInstall($("installGo").hidden ? "ios" : "android");
     }
+    // Le formulaire aussi, y compris son avis de confidentialité.
+    if (PROGRAMME.inscription && PROGRAMME.inscription.url) peindreFormulaire();
   }
 
   demarrer();

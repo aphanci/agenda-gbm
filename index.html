@@ -49,6 +49,16 @@
         <p class="status-aussi" id="statusAussi" hidden></p>
       </section>
 
+      <!-- ===== Invitation à s'enregistrer ===== -->
+      <div class="inscrire" id="inscrireBandeau" hidden>
+        <div class="inscrire-txt">
+          <p class="inscrire-titre" id="inscrireTitre"></p>
+          <p class="inscrire-detail" id="inscrireDetail"></p>
+        </div>
+        <button class="inscrire-go" id="inscrireOuvrir" type="button"></button>
+        <button class="inscrire-x" id="inscrireMasquer" type="button"></button>
+      </div>
+
       <!-- ===== Onglets des journées ===== -->
       <div class="tabs" role="tablist" id="tabs"></div>
 
@@ -98,6 +108,74 @@
       <button class="install-go" id="installGo" type="button" hidden></button>
       <button class="install-x" id="installX" type="button"></button>
     </aside>
+
+    <!-- ===== Le formulaire d'enregistrement, en plein écran ===== -->
+    <div class="panneau" id="inscrirePanneau" hidden role="dialog" aria-modal="true"
+         aria-labelledby="formTitre">
+      <div class="panneau-boite">
+
+        <header class="panneau-tete">
+          <h2 id="formTitre"></h2>
+          <button class="panneau-x" id="formFermer" type="button"></button>
+        </header>
+
+        <form class="form" id="formInscription" novalidate>
+          <p class="form-intro" id="formIntro"></p>
+
+          <label class="champ">
+            <span class="champ-nom" id="labNom"></span>
+            <input type="text" id="fNom" name="nom" autocomplete="name" required>
+          </label>
+
+          <label class="champ">
+            <span class="champ-nom" id="labQualite"></span>
+            <input type="text" id="fQualite" name="qualite" autocomplete="organization-title" required>
+            <span class="champ-aide" id="aideQualite"></span>
+          </label>
+
+          <label class="champ">
+            <span class="champ-nom" id="labOrganisation"></span>
+            <input type="text" id="fOrganisation" name="organisation" autocomplete="organization">
+          </label>
+
+          <label class="champ">
+            <span class="champ-nom" id="labEmail"></span>
+            <input type="email" id="fEmail" name="email" autocomplete="email" inputmode="email" required>
+          </label>
+
+          <!-- L'avis de confidentialité, écrit depuis programme.json -->
+          <section class="avis">
+            <h3 id="avisTitre"></h3>
+            <p id="avisTexte"></p>
+            <p id="avisDroits"></p>
+          </section>
+
+          <label class="consent">
+            <input type="checkbox" id="fConsent" name="consent" required>
+            <span id="labConsent"></span>
+          </label>
+
+          <p class="form-erreur" id="formErreur" hidden role="alert"></p>
+
+          <button type="submit" class="form-envoyer" id="formEnvoyer"></button>
+          <p class="form-note" id="formNote"></p>
+        </form>
+
+        <!-- L'écran de confirmation, une fois l'envoi réussi -->
+        <div class="merci" id="formMerci" hidden>
+          <div class="merci-ico" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 6L9 17l-5-5"></path>
+            </svg>
+          </div>
+          <h3 id="merciTitre"></h3>
+          <p id="merciTexte"></p>
+          <button type="button" class="merci-go" id="merciFermer"></button>
+        </div>
+
+      </div>
+    </div>
 
     <script src="app.js"></script>
   </body>

@@ -40,6 +40,27 @@
     }
   },
 
+  "inscription": {
+    "active": true,
+
+    "_a_completer": "Remplacer url et contact avant l'evenement. Tant que url est vide, le formulaire ne s'affiche pas.",
+    "url": "",
+    "contact": "[adresse e-mail a completer]",
+
+    "responsable": {
+      "fr": "le bureau de la Banque mondiale en Côte d'Ivoire",
+      "en": "the World Bank office in Côte d'Ivoire"
+    },
+    "finalite": {
+      "fr": "établir la liste des participants aux Journées Portes Ouvertes des 21 et 22 septembre 2026 et vous adresser les documents et suites de l'événement",
+      "en": "compiling the list of participants in the Open Days of 21–22 September 2026 and sending you the event's documents and follow-up"
+    },
+    "conservation": {
+      "fr": "12 mois après l'événement",
+      "en": "12 months after the event"
+    }
+  },
+
   "jours": [
     {
       "id": "j1",

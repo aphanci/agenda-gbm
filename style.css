@@ -690,6 +690,210 @@ body.avec-install .jump { margin-bottom: 92px; }
   .install-go { width: 100%; order: 3; }
 }
 
+/* ---------- 11. L'ENREGISTREMENT DES PARTICIPANTS ---------- */
+.inscrire {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 13px 14px;
+  background: var(--accent-fond);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+}
+.inscrire-txt { flex: 1 1 auto; min-width: 0; }
+.inscrire-titre {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--encre);
+}
+.inscrire-detail {
+  margin: 2px 0 0;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--encre-2);
+}
+.inscrire-go {
+  flex: none;
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  background: var(--direct-fond);
+  color: var(--direct-texte);
+  border-radius: 6px;
+  padding: 9px 14px;
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+.inscrire-x {
+  flex: none;
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  background: none;
+  color: var(--encre-3);
+  font-size: 14px;
+  line-height: 1;
+  padding: 7px;
+  border-radius: 6px;
+}
+
+/* Le panneau plein écran */
+.panneau {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(12, 35, 64, .55);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0;
+}
+.panneau-boite {
+  min-height: 100%;
+  background: var(--papier);
+  max-width: 560px;
+  margin: 0 auto;
+  padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+}
+.panneau-tete {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 15px 16px;
+  padding-top: calc(15px + env(safe-area-inset-top, 0px));
+  background: var(--surface);
+  border-bottom: 1px solid var(--filet);
+}
+.panneau-tete h2 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--encre);
+}
+.panneau-x {
+  flex: none;
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  background: var(--surface-2);
+  color: var(--encre-2);
+  border-radius: 6px;
+  width: 34px;
+  height: 34px;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.form { padding: 18px 16px 0; display: flex; flex-direction: column; gap: 16px; }
+.form-intro { margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--encre-2); }
+
+.champ { display: flex; flex-direction: column; gap: 6px; }
+.champ-nom { font-size: 12.5px; font-weight: 600; color: var(--encre); }
+.champ-aide { font-size: 11.5px; line-height: 1.4; color: var(--encre-3); }
+.champ input {
+  font-family: var(--sans);
+  font-size: 16px;            /* 16px : en dessous, iOS zoome à la saisie */
+  color: var(--encre);
+  background: var(--surface);
+  border: 1px solid var(--filet);
+  border-radius: 7px;
+  padding: 11px 12px;
+  min-height: 44px;           /* la cible tactile minimale */
+}
+.champ input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.avis {
+  background: var(--surface-2);
+  border-radius: 8px;
+  padding: 14px 15px;
+}
+.avis h3 {
+  margin: 0 0 7px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--encre-3);
+}
+.avis p { margin: 0; font-size: 12.5px; line-height: 1.55; color: var(--encre-2); }
+.avis p + p { margin-top: 9px; }
+
+.consent { display: flex; align-items: flex-start; gap: 11px; cursor: pointer; }
+.consent input {
+  flex: none;
+  width: 21px;
+  height: 21px;
+  margin: 1px 0 0;
+  accent-color: var(--accent);
+}
+.consent span { font-size: 12.5px; line-height: 1.5; color: var(--encre-2); }
+
+.form-erreur {
+  margin: 0;
+  padding: 11px 13px;
+  background: var(--accent-fond);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 6px 6px 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--encre);
+}
+.form-envoyer {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  background: var(--direct-fond);
+  color: var(--direct-texte);
+  border-radius: 7px;
+  padding: 14px 18px;
+  min-height: 48px;
+  font-family: var(--sans);
+  font-size: 14.5px;
+  font-weight: 700;
+}
+.form-envoyer:disabled { opacity: .6; cursor: default; }
+.form-note { margin: 0; font-size: 11.5px; line-height: 1.45; color: var(--encre-3); text-align: center; }
+
+.merci { padding: 44px 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.merci-ico {
+  width: 54px; height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent-fond);
+  color: var(--accent);
+}
+.merci-ico svg { width: 26px; height: 26px; }
+.merci h3 { margin: 0; font-family: var(--serif); font-size: 20px; font-weight: 700; color: var(--encre); }
+.merci p { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--encre-2); max-width: 36ch; }
+.merci-go {
+  margin-top: 8px;
+  appearance: none;
+  border: 1px solid var(--filet);
+  cursor: pointer;
+  background: var(--surface);
+  color: var(--encre);
+  border-radius: 7px;
+  padding: 11px 18px;
+  min-height: 44px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+@media (max-width: 380px) {
+  .inscrire { flex-wrap: wrap; }
+  .inscrire-go { width: 100%; order: 3; }
+}
+
 /* ---------- Téléphones étroits ---------- */
 @media (max-width: 420px) {
   .creneau { grid-template-columns: 54px 1fr; gap: 0 10px; }
