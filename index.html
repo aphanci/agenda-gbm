@@ -81,6 +81,24 @@
       <i></i> <span id="jumpLabel"></span>
     </button>
 
+    <!-- Bandeau d'installation. Masqué par défaut : le JavaScript décide
+         s'il doit apparaître, et sous quelle forme, selon le téléphone. -->
+    <aside class="install" id="install" hidden>
+      <div class="install-ico" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="2" width="14" height="20" rx="2.5"></rect>
+          <line x1="10.5" y1="18.5" x2="13.5" y2="18.5"></line>
+        </svg>
+      </div>
+      <div class="install-txt">
+        <p class="install-titre" id="installTitre"></p>
+        <p class="install-detail" id="installDetail"></p>
+      </div>
+      <button class="install-go" id="installGo" type="button" hidden></button>
+      <button class="install-x" id="installX" type="button"></button>
+    </aside>
+
     <script src="app.js"></script>
   </body>
 </html>

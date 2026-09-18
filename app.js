@@ -52,7 +52,12 @@
       erreurTitre: "Programme momentanément indisponible",
       erreurTexte: "Le programme n'a pas pu être chargé. Vérifiez votre connexion, puis rechargez la page.",
       chargement: "Chargement du programme…",
-      jour: "jour", jours: "jours", min: "min"
+      jour: "jour", jours: "jours", min: "min",
+      installTitre: "Installer l'agenda",
+      installDetail: "Un geste pour l'ouvrir, et il fonctionne sans réseau.",
+      installBouton: "Installer",
+      installIOS: "Touchez ⬆︎ en bas de l'écran, puis « Sur l'écran d'accueil ».",
+      installFermer: "Masquer"
     },
     en: {
       ouvreDans: "Opens in", ouvertureTitre: "Start of the event",
@@ -82,7 +87,12 @@
       erreurTitre: "Programme temporarily unavailable",
       erreurTexte: "The programme could not be loaded. Check your connection, then reload the page.",
       chargement: "Loading the programme…",
-      jour: "day", jours: "days", min: "min"
+      jour: "day", jours: "days", min: "min",
+      installTitre: "Install the agenda",
+      installDetail: "One tap to open it, and it works offline.",
+      installBouton: "Install",
+      installIOS: "Tap ⬆︎ at the bottom of the screen, then “Add to Home Screen”.",
+      installFermer: "Dismiss"
     }
   };
 
@@ -592,6 +602,109 @@
   }
 
   /* ============================================================
+     LE BANDEAU D'INSTALLATION
+     ============================================================
+     Aucune page web ne peut s'installer elle-même : les systèmes
+     réservent cette décision au visiteur. Mais on peut réduire
+     la manipulation au minimum, différemment selon l'appareil.
+
+     • Android / Chrome — le navigateur prévient la page qu'une
+       installation est possible, par l'événement beforeinstallprompt.
+       On met cet événement de côté, on affiche notre propre bouton,
+       et son clic ouvre la fenêtre officielle du système.
+     • iPhone / Safari — Apple n'offre aucun mécanisme équivalent.
+       Le mieux possible est d'afficher l'instruction, visiblement.
+     • Déjà installée, ou sur ordinateur — on n'affiche rien.
+     ============================================================ */
+  var evenementInstall = null;
+  var CLE_INSTALL = "agenda-install-masque";
+
+  /* La page tourne-t-elle déjà depuis l'écran d'accueil ? */
+  function dejaInstallee() {
+    try {
+      if (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) return true;
+    } catch (e) { }
+    return navigator.standalone === true;   // la façon de Safari sur iOS
+  }
+
+  function estIOS() {
+    var ua = navigator.userAgent || "";
+    // Depuis iPadOS 13, un iPad se déclare comme un Mac.
+    // On le démasque au nombre de points de contact tactiles.
+    var iPadDeguise = /Macintosh/.test(ua) && navigator.maxTouchPoints > 1;
+    return /iPad|iPhone|iPod/.test(ua) || iPadDeguise;
+  }
+
+  /* Sur iOS, seul Safari sait ajouter à l'écran d'accueil.
+     Chrome ou Firefox sur iPhone en sont incapables. */
+  function estSafariIOS() {
+    var ua = navigator.userAgent || "";
+    return estIOS() && !/CriOS|FxiOS|EdgiOS|OPiOS|GSA/.test(ua);
+  }
+
+  function installMasquee() {
+    try { return localStorage.getItem(CLE_INSTALL) === "1"; } catch (e) { return false; }
+  }
+  function masquerInstall() {
+    try { localStorage.setItem(CLE_INSTALL, "1"); } catch (e) { }
+    cacherBandeauInstall();
+  }
+  function cacherBandeauInstall() {
+    $("install").hidden = true;
+    document.body.classList.remove("avec-install");
+  }
+
+  function montrerBandeauInstall(mode) {
+    var T = UI[LANGUE];
+    $("installTitre").textContent = T.installTitre;
+    $("installDetail").textContent = mode === "ios" ? T.installIOS : T.installDetail;
+    $("installX").textContent = "✕";
+    $("installX").setAttribute("aria-label", T.installFermer);
+
+    var go = $("installGo");
+    go.hidden = (mode !== "android");
+    if (mode === "android") go.textContent = T.installBouton;
+
+    $("install").hidden = false;
+    document.body.classList.add("avec-install");
+  }
+
+  function preparerInstall() {
+    if (dejaInstallee() || installMasquee()) return;
+
+    // Android : Chrome nous préviendra. On garde l'événement de côté.
+    window.addEventListener("beforeinstallprompt", function (e) {
+      e.preventDefault();               // on refuse la bannière par défaut
+      evenementInstall = e;             // pour l'ouvrir nous-mêmes, plus tard
+      if (!dejaInstallee() && !installMasquee()) montrerBandeauInstall("android");
+    });
+
+    // iPhone : aucun événement n'existe. On affiche l'instruction.
+    if (estSafariIOS()) {
+      window.setTimeout(function () {
+        if (!dejaInstallee() && !installMasquee()) montrerBandeauInstall("ios");
+      }, 1200);
+    }
+
+    // L'installation a eu lieu : le bandeau n'a plus lieu d'être.
+    window.addEventListener("appinstalled", function () {
+      evenementInstall = null;
+      cacherBandeauInstall();
+    });
+
+    $("installGo").addEventListener("click", function () {
+      if (!evenementInstall) return;
+      evenementInstall.prompt();                       // la fenêtre du système
+      evenementInstall.userChoice.then(function () {
+        evenementInstall = null;
+        cacherBandeauInstall();
+      });
+    });
+
+    $("installX").addEventListener("click", masquerInstall);
+  }
+
+  /* ============================================================
      LE BOUTON « ALLER À MAINTENANT »
      ============================================================ */
   function noeudCible() {
@@ -669,6 +782,7 @@
       dessinerListe();
 
       majAnnonce();
+      preparerInstall();
       setInterval(majAnnonce, 3 * 60 * 1000);   // l'annonce, toutes les 3 minutes
       setInterval(rafraichir, 1000);            // l'horloge, chaque seconde
 
@@ -713,6 +827,10 @@
     peindreCadre();
     dessinerListe();
     majAnnonce();
+    // Le bandeau d'installation contient du texte : il suit la langue.
+    if (!$("install").hidden) {
+      montrerBandeauInstall($("installGo").hidden ? "ios" : "android");
+    }
   }
 
   demarrer();
