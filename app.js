@@ -91,8 +91,11 @@
       errConsent: "Merci de cocher la case pour poursuivre.",
       errReseau: "L'envoi n'a pas abouti. Vos informations sont conservées sur cet appareil et repartiront automatiquement dès que le réseau reviendra.",
       dejaInscrit: "Vous êtes enregistré",
-      cadreTermine: "J'ai terminé — voir le programme",
-      cadreNote: "Envoyez d'abord le formulaire ci-dessus, puis touchez ce bouton."
+      cadreTermine: "J'ai envoyé le formulaire — voir le programme",
+      cadreNote: "Envoyez d'abord le formulaire ci-dessus, puis touchez ce bouton.",
+      dejaTitre: "Vous vous êtes déjà enregistré ?",
+      dejaGo: "Ouvrir le programme",
+      cadreOu: "Sinon, enregistrez-vous ci-dessous — cela prend quelques secondes."
     },
     en: {
       ouvreDans: "Opens in", ouvertureTitre: "Start of the event",
@@ -161,8 +164,11 @@
       errConsent: "Please tick the box to continue.",
       errReseau: "The submission did not go through. Your details are kept on this device and will be sent automatically once the network is back.",
       dejaInscrit: "You are registered",
-      cadreTermine: "I'm done — show the programme",
-      cadreNote: "Submit the form above first, then tap this button."
+      cadreTermine: "I've submitted the form — show the programme",
+      cadreNote: "Submit the form above first, then tap this button.",
+      dejaTitre: "Already registered?",
+      dejaGo: "Open the programme",
+      cadreOu: "Otherwise, register below — it only takes a few seconds."
     }
   };
 
@@ -225,6 +231,13 @@
   } catch (e) { /* une adresse malformée ne doit pas casser la page */ }
 
   function maintenant() { return Date.now() + APERCU; }
+
+  /* La date d'un instant, exprimée dans l'heure de l'événement.
+     On ajoute le décalage AVANT de lire la date universelle : c'est ce
+     qui fait que 23 h à Abidjan reste le 21, et non le 22. */
+  function dateEvenement(t) {
+    return new Date(t + DECALAGE_MS).toISOString().slice(0, 10);
+  }
 
   /* La seule question qui compte pour chaque session. */
   function etatDe(s, t) {
@@ -642,9 +655,29 @@
     });
 
     if (prochaine) {
-      var memeJour = prochaine.jour === PROGRAMME.jours[jourParDefaut()];
+      /* ATTENTION au piège : comparer prochaine.jour à l'onglet affiché
+         ne répond PAS à la question « est-ce le même jour ? ». Le soir
+         du jour 1, l'onglet est déjà passé au jour 2, donc la comparaison
+         disait « même jour » alors qu'il restait quinze heures d'attente.
+
+         On compare donc les DATES réelles, dans l'heure de l'événement. */
+      var memeJour = dateEvenement(t) === prochaine.jour.date;
       kicker.className = "status-kicker";
-      kicker.innerHTML = badgeOuvert + '<span class="kicker-txt">'
+
+      /* Le badge dit si quelque chose est ouvert MAINTENANT, pas si
+         l'événement court encore.
+
+         Entre deux sessions du même jour, la Patinoire est bien ouverte
+         et les gens y sont : « Ouvert » est juste. Mais une fois la
+         journée terminée, la prochaine activité est le lendemain — et
+         afficher « Ouvert » à 22 h, quand plus rien ne se passe, ferait
+         croire à un visiteur qu'il peut encore venir. On bascule alors
+         sur le badge neutre « Pause », sans rien changer au reste :
+         l'heure et le nom de la prochaine activité restent affichés. */
+      kicker.innerHTML = (memeJour
+          ? badgeOuvert
+          : '<span class="badge-etat badge-fini">' + echapper(T.pause) + "</span>")
+        + '<span class="kicker-txt">'
         + echapper(T.aSuivre) + " " + compteARebours(prochaine.t0 - t) + "</span>";
       titre.textContent = prochaine.titre[LANGUE];
       sous.innerHTML = '<span class="horloge">'
@@ -811,6 +844,16 @@
   var CLE_INSCRIT = "agenda-inscrit";
   var CLE_ATTENTE = "agenda-inscription-attente";
   var CLE_INSCRIRE_MASQUE = "agenda-inscrire-masque";
+
+  /* Le geste unique qui ouvre l'agenda, d'où qu'il vienne : celui qui
+     vient d'envoyer le formulaire, comme celui qui revient et le déclare. */
+  function ouvrirLAgenda() {
+    noterInscrit();
+    $("inscrireBandeau").hidden = true;
+    $("formFermer").hidden = false;
+    document.body.classList.remove("verrouille");
+    fermerPanneau();
+  }
 
   function estInscrit() {
     try { return localStorage.getItem(CLE_INSCRIT) === "1"; } catch (e) { return false; }
@@ -1022,6 +1065,9 @@
       $("cadreTermine").textContent = T.cadreTermine;
       $("cadreNote").textContent = T.cadreNote;
       $("cadreForm").setAttribute("title", T.formTitre);
+      $("dejaTitre").textContent = T.dejaTitre;
+      $("cadreDeja").textContent = T.dejaGo;
+      $("cadreOu").textContent = T.cadreOu;
     }
   }
 
@@ -1060,18 +1106,21 @@
       $("cadreZone").hidden = false;
       if (!estInscrit()) $("cadreForm").setAttribute("src", conf.formulaireUrl);
 
-      /* Impossible de savoir depuis l'extérieur si le formulaire a été
+      /* Le code d'accès remplace la déclaration sur l'honneur.
+
+         Impossible de savoir depuis l'extérieur si le formulaire a été
          envoyé : il appartient à un autre domaine, et le navigateur
-         nous interdit de regarder dedans. C'est donc le visiteur qui
-         nous le dit. Le verrou n'a jamais été une serrure, seulement
-         un passage obligé — cela ne change rien à son efficacité. */
-      $("cadreTermine").addEventListener("click", function () {
-        noterInscrit();
-        $("inscrireBandeau").hidden = true;
-        $("formFermer").hidden = false;
-        document.body.classList.remove("verrouille");
-        fermerPanneau();
-      });
+         interdit de regarder dedans. Un simple bouton « j'ai terminé »
+         échouait donc DANS LES DEUX SENS — on entrait sans rien remplir,
+         et celui qui remplissait vraiment sans toucher le bouton n'était
+         pas retenu, donc on lui redemandait tout.
+
+         Le code affiché par Microsoft à la fin du formulaire est la seule
+         preuve que le visiteur peut nous rapporter lui-même. Ce n'est pas
+         une serrure — un code se répète de bouche à oreille — mais il
+         faut avoir envoyé le formulaire pour le connaître. */
+      $("cadreTermine").addEventListener("click", ouvrirLAgenda);
+      $("cadreDeja").addEventListener("click", ouvrirLAgenda);
     } else {
       viderLaFileDAttente();
     }

@@ -174,6 +174,22 @@
         <!-- Mode « formulaire Microsoft » : ton introduction et ton avis,
              puis le formulaire de Microsoft dans un cadre. -->
         <div class="cadre-zone" id="cadreZone" hidden>
+
+          <!-- LE RETOUR D'UN VISITEUR DÉJÀ ENREGISTRÉ.
+               Placé TOUT EN HAUT, avant le formulaire, et c'est le point
+               essentiel : sur iPhone, l'application posée sur l'écran
+               d'accueil ne partage pas sa mémoire avec Safari. Quelqu'un
+               qui s'est enregistré dans Safari puis installe l'icône
+               retombe sur un compartiment vide. Le widget ne peut pas le
+               reconnaître — mais il ne doit pas pour autant lui redemander
+               de tout remplir. Un appui suffit. -->
+          <div class="deja" id="dejaZone">
+            <p class="deja-titre" id="dejaTitre"></p>
+            <button type="button" class="deja-go" id="cadreDeja"></button>
+          </div>
+
+          <p class="cadre-ou" id="cadreOu"></p>
+
           <p class="form-intro" id="cadreIntro"></p>
 
           <section class="avis">

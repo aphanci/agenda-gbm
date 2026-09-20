@@ -1027,3 +1027,44 @@ body.verrouille { overflow: hidden; }
   .infos dl { grid-template-columns: 1fr; gap: 2px 0; }
   .infos dt { margin-top: 8px; }
 }
+
+/* ---------- 13. LE RETOUR D'UN VISITEUR DÉJÀ ENREGISTRÉ ----------
+   Ce bloc est posé AVANT le formulaire, et il doit se voir tout de
+   suite : c'est le premier écran que rencontre quelqu'un qui vient
+   d'installer l'icône sur son écran d'accueil. */
+.deja {
+  margin: 0 0 18px;
+  padding: 16px 16px 18px;
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  background: var(--accent-fond);
+  text-align: center;
+}
+.deja-titre {
+  margin: 0 0 12px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--encre);
+}
+.deja-go {
+  appearance: none;
+  border: 0;
+  cursor: pointer;
+  width: 100%;
+  background: var(--direct-fond);
+  color: var(--direct-texte);
+  border-radius: 7px;
+  padding: 13px 16px;
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* La séparation entre les deux chemins. */
+.cadre-ou {
+  margin: 0 0 16px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--encre-2);
+  text-align: center;
+}
