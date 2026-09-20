@@ -60,7 +60,7 @@
       credit: "Les horaires suivent le programme officiel. La session en cours et la suivante se mettent à jour automatiquement.",
       annonceInfo: "Information", annonceAlerte: "Changement de programme",
       erreurTitre: "Programme momentanément indisponible",
-      erreurTexte: "Le programme n'a pas pu être chargé. Vérifiez votre connexion, puis rechargez la page.",
+      erreurTexte: "Le programme n'a pas pu être chargé. Fermez l'application, vérifiez votre connexion, puis rouvrez-la.",
       chargement: "Chargement du programme…",
       jour: "jour", jours: "jours", min: "min",
       installTitre: "Installer l'agenda",
@@ -208,7 +208,25 @@
   var CLE_ETOILES = "agenda-etoiles";
   var CLE_THEME = "agenda-theme";   // la même clé que le script de l'en-tête
 
-  var $ = function (id) { return document.getElementById(id); };
+  /* Le raccourci vers un élément de la page.
+
+     Il rend un élément JETABLE quand l'élément demandé n'existe pas, au
+     lieu de rendre null. La raison est cuisante : une seule ligne
+     cherchant un élément absent — parce qu'un fichier n'avait pas été
+     mis en ligne avec les autres — faisait échouer tout le démarrage,
+     et l'application restait figée sur « Chargement du programme »,
+     sans un mot d'explication.
+
+     Désormais l'élément manquant est signalé dans la console, la ligne
+     qui le visait ne fait rien, et TOUT LE RESTE continue de
+     fonctionner. Une pièce absente ne doit jamais emporter l'ensemble. */
+  var $ = function (id) {
+    var el = document.getElementById(id);
+    if (el) return el;
+    console.warn("Élément introuvable dans la page :", id,
+                 "— le fichier index.html est-il à jour ?");
+    return document.createElement("span");
+  };
 
   /* ============================================================
      3. LE TEMPS
@@ -1393,8 +1411,8 @@
         + "collectés par " + resp + ", dans le seul but de " + fin + ". "
         + "Ils ne sont ni vendus, ni cédés à des tiers, ni utilisés à d'autres fins. "
         + "Ils sont conservés " + duree + ", puis supprimés. "
-        + (PROGRAMME.inscription
-            ? PROGRAMME.inscription.fr : "");
+        + (PROGRAMME.inscription.hebergement
+            ? PROGRAMME.inscription.hebergement.fr : "");
       $("avisDroits").textContent =
         (verrou
           ? "L'accès au programme suppose cet enregistrement. "
@@ -1408,8 +1426,8 @@
         + resp + ", for the sole purpose of " + fin + ". "
         + "They are never sold, passed to third parties, or used for anything else. "
         + "They are kept " + duree + ", then deleted. "
-        + (PROGRAMME.inscription
-            ? PROGRAMME.inscription.en : "");
+        + (PROGRAMME.inscription.hebergement
+            ? PROGRAMME.inscription.hebergement.en : "");
       $("avisDroits").textContent =
         (verrou
           ? "Access to the programme requires this registration. "
@@ -1771,6 +1789,12 @@
         }
         return suiteDuDemarrage(conf, garde);
       });
+    }).catch(function (e) {
+      /* Le filet. Sans lui, la moindre erreur laissait l'écran figé sur
+         « Chargement du programme » — le pire des comportements, parce
+         qu'il ne dit rien et laisse croire à un réseau lent. */
+      console.error("Démarrage interrompu :", e && e.message, e);
+      afficherErreur();
     });
   }
 

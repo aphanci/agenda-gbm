@@ -208,7 +208,15 @@
 
         <form class="form" id="formInscription" novalidate>
           <p class="form-intro" id="formIntro"></p>
-          <p class="astuce" id="astuceInstall" hidden></p>
+          <!-- Le conseil d'installation, ET le moyen de le suivre.
+               Le bandeau d'installation existe toujours, mais il vit
+               DERRIÈRE le panneau : pendant l'enregistrement, le visiteur
+               ne peut pas l'atteindre. Un conseil qu'on ne peut pas
+               suivre ne sert à rien — le bouton doit être ici. -->
+          <div class="astuce" id="astuceInstall" hidden>
+            <p id="astuceTexte"></p>
+            <button type="button" id="astuceGo" hidden></button>
+          </div>
 
           <!-- Les quatre champs reprennent EXACTEMENT le questionnaire :
                nom et prénoms réunis, qualité, e-mail et téléphone

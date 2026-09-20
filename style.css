@@ -1120,14 +1120,33 @@ body.verrouille { overflow: hidden; }
 /* La première entrée est la seule universelle : on la distingue. */
 .agenda-choix button.ics { font-weight: 600; color: var(--accent); }
 
-/* Le conseil d'installation, posé avant le formulaire. */
+/* Le conseil d'installation, posé avant le formulaire — et le bouton
+   qui permet de le suivre sans quitter le panneau. */
 .astuce {
   margin: 0 0 16px;
-  padding: 11px 13px;
+  padding: 12px 14px;
   border-left: 3px solid var(--accent);
   border-radius: 0 7px 7px 0;
   background: var(--accent-fond);
+}
+.astuce p {
+  margin: 0;
   font-size: 13px;
   line-height: 1.45;
   color: var(--encre-2);
 }
+.astuce button {
+  appearance: none;
+  border: 1px solid var(--accent);
+  cursor: pointer;
+  margin-top: 11px;
+  width: 100%;
+  background: var(--surface);
+  color: var(--accent);
+  border-radius: 7px;
+  padding: 11px 14px;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 700;
+}
+.astuce button:hover { background: var(--accent); color: var(--direct-texte); }
