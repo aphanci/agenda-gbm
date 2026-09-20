@@ -38,6 +38,8 @@
       jumpLabel: "Aller à maintenant",
       statutVerrou: "Enregistrez-vous pour ouvrir le programme",
       astuceInstall: "Conseil : ajoutez d'abord l'agenda à votre écran d'accueil, puis enregistrez-vous depuis l'icône. Vous n'aurez à le faire qu'une seule fois.",
+      astuceIOS: "Conseil : ajoutez d'abord l'agenda à votre écran d'accueil — touchez le bouton Partager en bas de l'écran, puis « Sur l'écran d'accueil » — et enregistrez-vous ensuite depuis l'icône. Vous n'aurez à le faire qu'une seule fois.",
+      astuceGo: "Ajouter à mon écran d'accueil",
       themeClair: "Affichage clair", themeSombre: "Affichage sombre",
       intervenants: "Intervenants", ajouterAgenda: "Ajouter à mon agenda",
       calApple: "iPhone, Apple Calendrier — et tout autre agenda",
@@ -116,6 +118,8 @@
       jumpLabel: "Jump to now",
       statutVerrou: "Register to open the programme",
       astuceInstall: "Tip: add the agenda to your home screen first, then register from the icon. You will only have to do it once.",
+      astuceIOS: "Tip: add the agenda to your home screen first — tap the Share button at the bottom of the screen, then « Add to Home Screen » — and register afterwards from the icon. You will only have to do it once.",
+      astuceGo: "Add to my home screen",
       themeClair: "Light display", themeSombre: "Dark display",
       intervenants: "Speakers", ajouterAgenda: "Add to my calendar",
       calApple: "iPhone, Apple Calendar — and any other calendar",
@@ -965,13 +969,37 @@
     document.body.classList.add("avec-install");
   }
 
+  /* Le bouton d'installation POSÉ DANS le panneau d'enregistrement.
+     Il n'apparaît que sur Android, quand Chrome nous a effectivement
+     proposé l'installation — sur iPhone aucun bouton n'existe, seule
+     la manipulation par le menu Partager est possible, et le texte
+     du conseil l'explique. */
+  function majInstallPanneau() {
+    var b = $("astuceGo");
+    if (!b) return;
+    b.hidden = !evenementInstall || dejaInstallee();
+  }
+
   function preparerInstall() {
+    $("astuceGo").addEventListener("click", function () {
+      if (!evenementInstall) return;
+      evenementInstall.prompt();
+      evenementInstall.userChoice.then(function () {
+        evenementInstall = null;
+        cacherBandeauInstall();
+        majInstallPanneau();
+      });
+    });
+
     if (dejaInstallee() || installMasquee()) return;
 
     // Android : Chrome nous préviendra. On garde l'événement de côté.
     window.addEventListener("beforeinstallprompt", function (e) {
       e.preventDefault();               // on refuse la bannière par défaut
       evenementInstall = e;             // pour l'ouvrir nous-mêmes, plus tard
+      /* L'événement arrive souvent APRÈS l'affichage du panneau :
+         il faut donc revenir allumer le bouton à ce moment-là. */
+      majInstallPanneau();
       if (!dejaInstallee() && !installMasquee()) montrerBandeauInstall("android");
     });
 
@@ -1137,6 +1165,8 @@
      continue de fonctionner sans réseau — ce qui était tout l'intérêt
      du dispositif dans une salle saturée. */
   var CLE_PROG = "agenda-programme";
+  var CACHE_PARTAGE = "agenda-partage";
+  var URL_PARTAGE = "./programme-du-visiteur.json";
 
   function lireProgrammeGarde() {
     try {
@@ -1146,8 +1176,71 @@
       return (p && p.jours && p.jours.length) ? p : null;
     } catch (e) { return null; }
   }
+
+  /* ---------- LE PONT ENTRE SAFARI ET L'ÉCRAN D'ACCUEIL ----------
+     Sur iPhone, l'application posée sur l'écran d'accueil ne partage
+     avec Safari ni localStorage, ni les cookies, ni IndexedDB : Apple
+     les cloisonne. Le CACHE STORAGE, lui, semble franchir cette
+     frontière depuis Safari 14 — il sert au hors-connexion, et Apple
+     le traite différemment.
+
+     On écrit donc le programme AUX DEUX ENDROITS. Si le pont existe,
+     le visiteur qui s'enregistre dans Safari puis installe l'icône
+     retrouve son programme sans rien refaire. Si le pont n'existe pas,
+     localStorage prend le relais exactement comme avant : cet ajout ne
+     peut rien casser, il ne peut que réparer. */
+  function partagerProgramme(prog) {
+    try {
+      if (!window.caches) return;
+
+      /* On met le programme en texte TOUT DE SUITE, avant d'ouvrir le
+         cache — et c'est la seule ligne qui compte vraiment ici.
+
+         L'ouverture du cache est asynchrone. Si l'on attendait sa
+         réponse pour convertir le programme, la conversion aurait lieu
+         APRÈS installerProgramme(), qui relie chaque session à sa
+         journée et chaque journée à ses sessions. Cette boucle est
+         normale pour l'affichage, mais JSON.stringify refuse de la
+         convertir : il tourne en rond. L'erreur partait alors dans le
+         .catch et disparaissait sans bruit — localStorage, lui,
+         fonctionnait, parce qu'il convertit immédiatement. */
+      var texte = JSON.stringify(prog);
+
+      caches.open(CACHE_PARTAGE).then(function (reserve) {
+        return reserve.put(URL_PARTAGE, new Response(texte,
+          { headers: { "Content-Type": "application/json" } }));
+      }).catch(function (e) {
+        console.warn("Pont vers l'écran d'accueil indisponible :", e.message);
+      });
+    } catch (e) {
+      console.warn("Pont vers l'écran d'accueil impossible :", e.message);
+    }
+  }
+
+  /* La lecture est forcément asynchrone : le Cache Storage ne répond
+     que par promesse. On ne fait jamais échouer le démarrage pour ça —
+     en cas de doute, on rend null et localStorage reprend la main. */
+  function lireProgrammePartage() {
+    return new Promise(function (resoudre) {
+      try {
+        if (!window.caches) return resoudre(null);
+        var fini = false;
+        var rendre = function (v) { if (!fini) { fini = true; resoudre(v); } };
+        // Garde-fou : si le cache ne répond pas, on n'attend pas plus d'une seconde.
+        window.setTimeout(function () { rendre(null); }, 1000);
+
+        caches.open(CACHE_PARTAGE)
+          .then(function (reserve) { return reserve.match(URL_PARTAGE); })
+          .then(function (rep) { return rep ? rep.json() : null; })
+          .then(function (p) { rendre(p && p.jours && p.jours.length ? p : null); })
+          .catch(function () { rendre(null); });
+      } catch (e) { resoudre(null); }
+    });
+  }
+
   function garderProgramme(prog) {
     try { localStorage.setItem(CLE_PROG, JSON.stringify(prog)); } catch (e) { }
+    partagerProgramme(prog);
   }
 
   /* Au chargement, on retente ce qui n'était pas parti.
@@ -1261,7 +1354,9 @@
                  || window.navigator.standalone === true;
     } catch (e) { }
     $("astuceInstall").hidden = dejaPose;
-    $("astuceInstall").textContent = T.astuceInstall;
+    $("astuceTexte").textContent = estSafariIOS() ? T.astuceIOS : T.astuceInstall;
+    $("astuceGo").textContent = T.astuceGo;
+    majInstallPanneau();
     $("labNom").textContent = T.labNom;
     $("labQualite").textContent = T.labQualite;
     $("labAutre").textContent = T.labAutre;
@@ -1666,7 +1761,21 @@
          sessions vivent dans la base, et n'en sortent qu'après un
          enregistrement. C'est précisément ce qui rend le verrou réel :
          il n'y a plus de fichier public à contourner. */
-      var garde = lireProgrammeGarde();
+      /* On interroge les deux réserves. Celle de Safari d'abord, puis
+         celle que l'écran d'accueil peut voir. */
+      return lireProgrammePartage().then(function (partage) {
+        var garde = lireProgrammeGarde() || partage;
+        // Retrouvé par le pont seulement : on le recopie côté local.
+        if (!lireProgrammeGarde() && partage) {
+          try { localStorage.setItem(CLE_PROG, JSON.stringify(partage)); } catch (e) { }
+        }
+        return suiteDuDemarrage(conf, garde);
+      });
+    });
+  }
+
+  function suiteDuDemarrage(conf, garde) {
+    {
       conf.jours = (garde && garde.jours) ? garde.jours : [];
       if (garde && garde.meta && garde.meta.categories) {
         conf.meta.categories = garde.meta.categories;
@@ -1741,7 +1850,7 @@
         var n = noeudCible();
         if (n) n.li.scrollIntoView({ behavior: "smooth", block: "center" });
       }, 450);
-    });
+    }
   }
 
   function changerLangue(nouvelle) {
