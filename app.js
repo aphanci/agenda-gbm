@@ -36,8 +36,14 @@
       enParallele: "en parallèle", aussiOuvert: "Aussi ouvert maintenant :",
       mesSessions: "Mes sessions", toutAgenda: "Tout l'agenda",
       jumpLabel: "Aller à maintenant",
+      statutVerrou: "Enregistrez-vous pour ouvrir le programme",
       themeClair: "Affichage clair", themeSombre: "Affichage sombre",
       intervenants: "Intervenants", ajouterAgenda: "Ajouter à mon agenda",
+      calApple: "iPhone, Apple Calendrier — et tout autre agenda",
+      calGoogle: "Google Agenda",
+      calOutlookPro: "Outlook professionnel",
+      calOutlookPerso: "Outlook.com personnel",
+      calYahoo: "Yahoo Agenda",
       marquer: "Marquer cette session",
       videEtoiles: "Aucune session marquée pour ce jour. Touchez l'étoile ★ d'une session pour la retrouver ici.",
       infosTitre: "Informations pratiques",
@@ -65,15 +71,14 @@
       inscrireBouton: "S'enregistrer",
       inscrireMasquer: "Masquer",
       formTitre: "Enregistrement des participants",
-      formIntro: "Quatre informations, et vous recevrez les documents de l'événement. Les champs marqués d'une étoile sont nécessaires.",
+      formIntro: "Merci de vous enregistrer pour accéder au programme. Les champs marqués d'une étoile sont nécessaires ; les deux derniers sont facultatifs.",
       formIntroVerrou: "Merci de vous enregistrer pour accéder au programme. Quelques secondes, et vous recevrez aussi les documents de l'événement.",
-      labNom: "Nom *",
-      labPrenom: "Prénom *",
+      labNom: "Nom & Prénoms *",
+      labTel: "Numéro de téléphone (avec l'indicatif pays)",
       labQualite: "Vous êtes *",
       labQualiteVide: "— Choisissez —",
       labAutre: "Précisez *",
-      labOrganisation: "Organisation",
-      labEmail: "Adresse e-mail *",
+      labEmail: "Adresse e-mail — pour recevoir les documents de l'événement",
       avisTitre: "Ce que deviennent vos informations",
       labConsent: "J'ai lu ce qui précède et j'accepte que mes informations soient utilisées dans ce cadre.",
       formEnvoyer: "Envoyer",
@@ -83,13 +88,12 @@
       merciTitre: "C'est enregistré",
       merciTexte: "Merci. Vous recevrez les documents de l'événement à l'adresse indiquée.",
       merciFermer: "Revenir à l'agenda",
-      errNom: "Merci d'indiquer votre nom.",
-      errPrenom: "Merci d'indiquer votre prénom.",
+      errNom: "Merci d'indiquer votre nom ET votre prénom.",
       errQualite: "Merci de choisir dans la liste.",
       errAutre: "Merci de préciser.",
       errEmail: "Cette adresse e-mail ne semble pas valide.",
       errConsent: "Merci de cocher la case pour poursuivre.",
-      errReseau: "L'envoi n'a pas abouti. Vos informations sont conservées sur cet appareil et repartiront automatiquement dès que le réseau reviendra.",
+      errReseau: "Connexion impossible pour le moment. Vérifiez votre réseau, puis touchez à nouveau « Envoyer ».",
       dejaInscrit: "Vous êtes enregistré",
       cadreTermine: "J'ai envoyé le formulaire — voir le programme",
       cadreNote: "Envoyez d'abord le formulaire ci-dessus, puis touchez ce bouton.",
@@ -109,8 +113,14 @@
       enParallele: "in parallel", aussiOuvert: "Also open now:",
       mesSessions: "My sessions", toutAgenda: "Full agenda",
       jumpLabel: "Jump to now",
+      statutVerrou: "Register to open the programme",
       themeClair: "Light display", themeSombre: "Dark display",
       intervenants: "Speakers", ajouterAgenda: "Add to my calendar",
+      calApple: "iPhone, Apple Calendar — and any other calendar",
+      calGoogle: "Google Calendar",
+      calOutlookPro: "Outlook for work",
+      calOutlookPerso: "Outlook.com personal",
+      calYahoo: "Yahoo Calendar",
       marquer: "Mark this session",
       videEtoiles: "No sessions marked for this day. Tap the ★ on a session to find it here.",
       infosTitre: "Practical information",
@@ -138,15 +148,14 @@
       inscrireBouton: "Register",
       inscrireMasquer: "Dismiss",
       formTitre: "Participant registration",
-      formIntro: "Four details, and you will receive the event's documents. Fields marked with a star are required.",
+      formIntro: "Please register to open the programme. Fields marked with a star are required; the last two are optional.",
       formIntroVerrou: "Please register to view the programme. It takes a few seconds, and you will also receive the event's documents.",
-      labNom: "Surname *",
-      labPrenom: "First name *",
+      labNom: "Full name *",
+      labTel: "Phone number (with country code)",
       labQualite: "You are *",
       labQualiteVide: "— Please choose —",
       labAutre: "Please specify *",
-      labOrganisation: "Organisation",
-      labEmail: "Email address *",
+      labEmail: "Email address — to receive the event's documents",
       avisTitre: "What happens to your information",
       labConsent: "I have read the above and agree that my information may be used for this purpose.",
       formEnvoyer: "Send",
@@ -156,13 +165,12 @@
       merciTitre: "You're registered",
       merciTexte: "Thank you. You will receive the event's documents at the address you gave.",
       merciFermer: "Back to the agenda",
-      errNom: "Please give your surname.",
-      errPrenom: "Please give your first name.",
+      errNom: "Please give your first name AND surname.",
       errQualite: "Please choose from the list.",
       errAutre: "Please specify.",
       errEmail: "That email address does not look valid.",
       errConsent: "Please tick the box to continue.",
-      errReseau: "The submission did not go through. Your details are kept on this device and will be sent automatically once the network is back.",
+      errReseau: "Could not connect right now. Check your network, then tap Send again.",
       dejaInscrit: "You are registered",
       cadreTermine: "I've submitted the form — show the programme",
       cadreNote: "Submit the form above first, then tap this button.",
@@ -305,6 +313,30 @@
 
   /* Prépare les données une fois pour toutes : on calcule les
      instants de début et de fin, et on donne une clé à chaque session. */
+  /* Tant que le visiteur n'est pas enregistré, il n'y a aucune session.
+     preparer() suppose au moins une journée — on lui évite ce cas. */
+  function preparerOuVide(prog) {
+    DECALAGE_MS = lireDecalage(prog.meta.utcOffset);
+    if (!prog.jours || !prog.jours.length) {
+      prog.jours = [];
+      prog.ouverture = 0;
+      prog.fermeture = 0;
+      return prog;
+    }
+    return preparer(prog);
+  }
+
+  /* Le programme revenu de la base prend la place du vide. */
+  function installerProgramme(prog) {
+    PROGRAMME.jours = prog.jours;
+    if (prog.meta && prog.meta.categories) PROGRAMME.meta.categories = prog.meta.categories;
+    PROGRAMME = preparerOuVide(PROGRAMME);
+    jourActif = jourParDefaut();
+    peindreCadre();
+    dessinerListe();
+    rafraichir();
+  }
+
   function preparer(prog) {
     DECALAGE_MS = lireDecalage(prog.meta.utcOffset);
 
@@ -352,7 +384,31 @@
       + deuxChiffres(d.getUTCMinutes()) + "00Z";
   }
 
-  function lienAgenda(s) {
+  /* Le même instant, écrit dans les trois dialectes que réclament les
+     agendas du marché. Aucun n'a voulu se mettre d'accord sur un format.
+
+       Google et l'iCalendar : 20260921T093000Z  (universel, en UTC)
+       Outlook              : 2026-09-21T09:30:00Z  (la norme ISO)
+       Yahoo                : 20260921T093000  (l'heure LOCALE, sans Z) */
+  function horodatageGoogle(ms) {
+    var d = new Date(ms);
+    return d.getUTCFullYear()
+      + deuxChiffres(d.getUTCMonth() + 1)   // les mois vont de 0 à 11 : d'où le + 1
+      + deuxChiffres(d.getUTCDate()) + "T"
+      + deuxChiffres(d.getUTCHours())
+      + deuxChiffres(d.getUTCMinutes()) + "00Z";
+  }
+  function horodatageOutlook(ms) {
+    return new Date(ms).toISOString().replace(/\.\d{3}Z$/, "Z");
+  }
+  function horodatageYahoo(ms) {
+    // Yahoo attend l'heure de l'événement, pas l'heure universelle : on
+    // ajoute le décalage AVANT de lire, puis on retire le Z.
+    return horodatageGoogle(ms + DECALAGE_MS).replace("Z", "");
+  }
+
+  /* Le descriptif, construit une seule fois pour les cinq destinations. */
+  function corpsAgenda(s) {
     var corps = [];
     if (s.resume) corps.push(s.resume[LANGUE]);
     if (s.details) corps.push(s.details[LANGUE].map(function (x) { return "• " + x; }).join("\n"));
@@ -361,11 +417,98 @@
         return "• " + p.nom[LANGUE] + (p.role ? " — " + p.role[LANGUE] : "");
       }).join("\n"));
     }
+    return corps.join("\n\n");
+  }
+
+  function lienGoogle(s) {
     return "https://calendar.google.com/calendar/render?action=TEMPLATE"
       + "&text=" + encodeURIComponent(s.titre[LANGUE])
       + "&dates=" + horodatageGoogle(s.t0) + "/" + horodatageGoogle(s.t1)
       + "&location=" + encodeURIComponent(PROGRAMME.meta.lieuComplet)
-      + "&details=" + encodeURIComponent(corps.join("\n\n"));
+      + "&details=" + encodeURIComponent(corpsAgenda(s));
+  }
+  /* Deux adresses distinctes pour Outlook, et ce n'est pas un doublon :
+     outlook.office.com sert les comptes professionnels, outlook.live.com
+     les comptes personnels. Un ministère est sur le premier, un visiteur
+     avec une adresse hotmail sur le second, et l'un ne reçoit pas l'autre. */
+  function lienOutlook(s, pro) {
+    return "https://outlook." + (pro ? "office" : "live") + ".com/calendar/deeplink/compose"
+      + "?path=%2Fcalendar%2Faction%2Fcompose&rru=addevent"
+      + "&subject=" + encodeURIComponent(s.titre[LANGUE])
+      + "&startdt=" + encodeURIComponent(horodatageOutlook(s.t0))
+      + "&enddt=" + encodeURIComponent(horodatageOutlook(s.t1))
+      + "&location=" + encodeURIComponent(PROGRAMME.meta.lieuComplet)
+      + "&body=" + encodeURIComponent(corpsAgenda(s));
+  }
+  function lienYahoo(s) {
+    return "https://calendar.yahoo.com/?v=60"
+      + "&TITLE=" + encodeURIComponent(s.titre[LANGUE])
+      + "&ST=" + horodatageYahoo(s.t0)
+      + "&ET=" + horodatageYahoo(s.t1)
+      + "&in_loc=" + encodeURIComponent(PROGRAMME.meta.lieuComplet)
+      + "&DESC=" + encodeURIComponent(corpsAgenda(s));
+  }
+
+  /* ---------- Le fichier .ics ----------
+     C'est la seule pièce vraiment universelle : Apple Calendrier,
+     Outlook installé, Thunderbird, les agendas Android et tous les
+     autres savent l'ouvrir. Les liens ci-dessus ne servent que les
+     agendas consultés dans un navigateur. */
+  function echapperIcs(txt) {
+    return String(txt)
+      .replace(/\\/g, "\\\\").replace(/;/g, "\\;")
+      .replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+  }
+  function plier(ligne) {
+    /* La norme iCalendar limite chaque ligne à 75 octets ; au-delà, on
+       coupe et on reprend avec une espace. Des accents mal comptés ici
+       donnent un fichier que certains agendas refusent d'ouvrir — d'où
+       le comptage en OCTETS et non en caractères. */
+    var sortie = "", courant = "", octets = 0;
+    for (var i = 0; i < ligne.length; i++) {
+      var c = ligne[i];
+      var n = unescape(encodeURIComponent(c)).length;
+      if (octets + n > 73) { sortie += courant + "\r\n "; courant = ""; octets = 0; }
+      courant += c; octets += n;
+    }
+    return sortie + courant;
+  }
+  function fabriquerIcs(s) {
+    var lignes = [
+      "BEGIN:VCALENDAR", "VERSION:2.0", "CALSCALE:GREGORIAN", "METHOD:PUBLISH",
+      "PRODID:-//Journees Portes Ouvertes GBM//Agenda//FR",
+      "BEGIN:VEVENT",
+      "UID:" + s.jour.date + "-" + s.debut.replace(":", "") + "@agenda-gbm",
+      "DTSTAMP:" + horodatageGoogle(Date.now()),
+      "DTSTART:" + horodatageGoogle(s.t0),
+      "DTEND:" + horodatageGoogle(s.t1),
+      "SUMMARY:" + echapperIcs(s.titre[LANGUE]),
+      "LOCATION:" + echapperIcs(PROGRAMME.meta.lieuComplet),
+      "DESCRIPTION:" + echapperIcs(corpsAgenda(s)),
+      "END:VEVENT", "END:VCALENDAR"
+    ];
+    return lignes.map(plier).join("\r\n") + "\r\n";
+  }
+  function telechargerIcs(s) {
+    try {
+      var lien = document.createElement("a");
+      var url = URL.createObjectURL(new Blob([fabriquerIcs(s)],
+                  { type: "text/calendar;charset=utf-8" }));
+      lien.href = url;
+      /* Un nom de fichier SANS accent ni ponctuation : c'est ce que
+         verra le visiteur dans ses téléchargements, et les accents s'y
+         transforment volontiers en caractères illisibles selon le
+         téléphone. On garde la date et l'heure, qui suffisent à s'y
+         retrouver quand on en a enregistré plusieurs. */
+      lien.download = "JPO-GBM-" + s.jour.date + "-" + s.debut.replace(":", "h") + ".ics";
+      document.body.appendChild(lien);
+      lien.click();
+      document.body.removeChild(lien);
+      // On libère la mémoire, mais pas avant que le navigateur ait lu.
+      window.setTimeout(function () { URL.revokeObjectURL(url); }, 30000);
+    } catch (e) {
+      console.warn("Téléchargement du fichier .ics impossible :", e.message);
+    }
   }
 
   /* ============================================================
@@ -387,6 +530,7 @@
 
   /* Le jour à ouvrir par défaut : celui en cours, sinon le prochain. */
   function jourParDefaut() {
+    if (!PROGRAMME.jours.length) return 0;
     var t = maintenant();
     for (var i = 0; i < PROGRAMME.jours.length; i++) {
       if (t < PROGRAMME.jours[i].fermeture) return i;
@@ -420,11 +564,15 @@
 
     $("infosTitre").textContent = T.infosTitre;
 
+    /* Les dates viennent des journées ; tant qu'elles ne sont pas
+       chargées, on se rabat sur le libellé fixe des données. */
     var j0 = PROGRAMME.jours[0];
     var jN = PROGRAMME.jours[PROGRAMME.jours.length - 1];
+    var libDates = j0 ? (j0.dateCourte[LANGUE] + " – " + jN.dateCourte[LANGUE])
+                      : (M.dates ? M.dates[LANGUE] : "");
     var infos = [
       [T.libLieu, M.lieuComplet],
-      [T.libDates, j0.dateCourte[LANGUE] + " – " + jN.dateCourte[LANGUE]],
+      [T.libDates, libDates],
       [T.libHeure, "UTC" + M.utcOffset],
       [T.libEntree, T.valEntree]
     ];
@@ -458,8 +606,12 @@
   /* Construit la liste des sessions du jour affiché. */
   function dessinerListe() {
     var T = UI[LANGUE];
-    var jour = PROGRAMME.jours[jourActif];
     var rail = $("rail");
+
+    /* Avant enregistrement, PROGRAMME.jours est vide — le programme est
+       encore dans la base. La liste ne doit pas planter pour autant. */
+    var jour = PROGRAMME.jours[jourActif];
+    if (!jour) { rail.innerHTML = ""; noeuds = []; $("sousTitre").textContent = ""; return; }
 
     $("sousTitre").textContent = jour.sousTitre[LANGUE];
 
@@ -516,9 +668,23 @@
             }).join("") + "</ul></div>";
         }
         html += '<div class="emplacement-progression"></div>';
-        html += '<a class="agenda-lien" href="' + echapper(lienAgenda(s))
-          + '" target="_blank" rel="noopener"><span aria-hidden="true">+</span> <span>'
-          + echapper(T.ajouterAgenda) + "</span></a>";
+        /* Un <details> plutôt qu'un menu écrit à la main : le navigateur
+           gère l'ouverture, la fermeture, le clavier et la lecture vocale.
+           Rien à programmer, rien à maintenir. */
+        html += '<details class="agenda-choix"><summary>'
+          + '<span aria-hidden="true">+</span> <span>' + echapper(T.ajouterAgenda)
+          + "</span></summary><ul>"
+          + '<li><button type="button" class="ics" data-ics="' + echapper(s.cle) + '">'
+          + echapper(T.calApple) + "</button></li>"
+          + '<li><a href="' + echapper(lienGoogle(s)) + '" target="_blank" rel="noopener">'
+          + echapper(T.calGoogle) + "</a></li>"
+          + '<li><a href="' + echapper(lienOutlook(s, true)) + '" target="_blank" rel="noopener">'
+          + echapper(T.calOutlookPro) + "</a></li>"
+          + '<li><a href="' + echapper(lienOutlook(s, false)) + '" target="_blank" rel="noopener">'
+          + echapper(T.calOutlookPerso) + "</a></li>"
+          + '<li><a href="' + echapper(lienYahoo(s)) + '" target="_blank" rel="noopener">'
+          + echapper(T.calYahoo) + "</a></li>"
+          + "</ul></details>";
         html += "</div>";
       }
 
@@ -596,6 +762,18 @@
 
     aussi.hidden = true;
     titre.className = "status-titre";
+
+    /* Aucune session chargée : la barre de statut invite simplement
+       à s'enregistrer, au lieu d'afficher un décompte vers rien. */
+    if (!PROGRAMME.jours.length) {
+      kicker.className = "status-kicker";
+      kicker.textContent = "";
+      titre.className = "status-titre";
+      titre.textContent = T.statutVerrou;
+      sous.textContent = "";
+      aussi.hidden = true;
+      return;
+    }
 
     /* ---- AVANT L'OUVERTURE : le compte à rebours, à la seconde ---- */
     if (t < PROGRAMME.ouverture) {
@@ -888,17 +1066,74 @@
   }
 
   /* L'envoi lui-même. Renvoie une promesse vraie/fausse. */
+  /* ============================================================
+     L'ENVOI À LA BASE — et le retour du programme
+     ============================================================
+     Le changement décisif tient en une phrase : ce n'est plus un
+     envoi, c'est un ÉCHANGE. On transmet l'enregistrement, et la
+     base renvoie le programme en retour.
+
+     C'est ce qui rend le verrou réel. Auparavant le programme était
+     un fichier public : le contrôle s'exécutait dans le navigateur,
+     après que les données avaient déjà été livrées, et se contournait
+     donc trivialement. Désormais le programme ne quitte la base
+     qu'après que la ligne du participant y a été écrite — et cette
+     décision-là se prend sur le serveur, hors d'atteinte du visiteur.
+     ============================================================ */
   function envoyerInscription(donnees) {
     var conf = PROGRAMME.inscription;
-    if (!conf || !conf.url) return Promise.resolve(false);
+    if (!conf || !conf.baseUrl || !conf.baseCle) return Promise.resolve(null);
 
-    return fetch(conf.url, {
+    return fetch(conf.baseUrl.replace(/\/+$/, "") + "/rest/v1/rpc/enregistrer", {
       method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify(donnees)
+      headers: {
+        "apikey": conf.baseCle,
+        "Authorization": "Bearer " + conf.baseCle,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        p_nom_complet: donnees.nom,
+        p_qualite:     donnees.qualiteCle,
+        p_autre:       donnees.precision || null,
+        p_email:       donnees.email || null,
+        p_telephone:   donnees.telephone || null,
+        p_langue:      donnees.langue
+      })
     })
-      .then(function (r) { return r.ok; })
-      .catch(function () { return false; });
+      .then(function (r) {
+        if (!r.ok) return r.text().then(function (t) {
+          console.warn("Enregistrement refusé :", r.status, t.slice(0, 200));
+          return null;
+        });
+        return r.json();
+      })
+      .then(function (prog) {
+        // On n'accepte la réponse que si elle contient vraiment un programme.
+        return (prog && prog.jours && prog.jours.length) ? prog : null;
+      })
+      .catch(function (e) {
+        console.warn("Base injoignable :", e.message);
+        return null;
+      });
+  }
+
+  /* ---------- La réserve locale du programme ----------
+     Une fois obtenu, le programme est gardé sur l'appareil : le
+     visiteur ne se ré-enregistre pas à chaque ouverture, et l'agenda
+     continue de fonctionner sans réseau — ce qui était tout l'intérêt
+     du dispositif dans une salle saturée. */
+  var CLE_PROG = "agenda-programme";
+
+  function lireProgrammeGarde() {
+    try {
+      var brut = localStorage.getItem(CLE_PROG);
+      if (!brut) return null;
+      var p = JSON.parse(brut);
+      return (p && p.jours && p.jours.length) ? p : null;
+    } catch (e) { return null; }
+  }
+  function garderProgramme(prog) {
+    try { localStorage.setItem(CLE_PROG, JSON.stringify(prog)); } catch (e) { }
   }
 
   /* Au chargement, on retente ce qui n'était pas parti.
@@ -943,6 +1178,12 @@
     var c = PROGRAMME.inscription;
     return !!(c && c.mode === "formulaire");
   }
+  /* Mode « base » : le formulaire est le nôtre, et il dialogue
+     directement avec Supabase. */
+  function modeBase() {
+    var c = PROGRAMME.inscription;
+    return !!(c && c.mode === "base");
+  }
 
   /* Y a-t-il quelque part où envoyer ? Sans destination, on n'affiche
      rien du tout — surtout pas un verrou qui enfermerait les visiteurs
@@ -950,6 +1191,7 @@
   function destinationPrete() {
     var c = PROGRAMME.inscription;
     if (!c || c.active !== true) return false;
+    if (modeBase()) return !!(c.baseUrl && c.baseCle);
     return modeFormulaire() ? !!c.formulaireUrl : !!c.url;
   }
 
@@ -995,12 +1237,11 @@
     $("formTitre").textContent = T.formTitre;
     $("formIntro").textContent = verrouActif() ? T.formIntroVerrou : T.formIntro;
     $("labNom").textContent = T.labNom;
-    $("labPrenom").textContent = T.labPrenom;
     $("labQualite").textContent = T.labQualite;
     $("labAutre").textContent = T.labAutre;
     peindreQualites();
-    $("labOrganisation").textContent = T.labOrganisation;
     $("labEmail").textContent = T.labEmail;
+    $("labTel").textContent = T.labTel;
     $("labConsent").textContent = T.labConsent;
     $("formEnvoyer").textContent = T.formEnvoyer;
     $("formNote").textContent = T.formNote;
@@ -1026,11 +1267,13 @@
 
     if (LANGUE === "fr") {
       $("avisTexte").textContent =
-        "Vos nom, prénom, qualité et organisation — ainsi que votre adresse "
-        + "e-mail si vous choisissez de la donner — sont "
+        "Vos nom et prénoms et votre qualité — ainsi que votre adresse "
+        + "e-mail et votre téléphone si vous choisissez de les donner — sont "
         + "collectés par " + resp + ", dans le seul but de " + fin + ". "
         + "Ils ne sont ni vendus, ni cédés à des tiers, ni utilisés à d'autres fins. "
-        + "Ils sont conservés " + duree + ", puis supprimés.";
+        + "Ils sont conservés " + duree + ", puis supprimés. "
+        + (PROGRAMME.inscription.hebergement
+            ? PROGRAMME.inscription.hebergement.fr : "");
       $("avisDroits").textContent =
         (verrou
           ? "L'accès au programme suppose cet enregistrement. "
@@ -1039,11 +1282,13 @@
         + "à tout moment en écrivant à " + contact + ".";
     } else {
       $("avisTexte").textContent =
-        "Your surname, first name, role and organisation — and your email "
-        + "address if you choose to provide it — are collected by "
+        "Your full name and your role — and your email address and phone "
+        + "number if you choose to provide them — are collected by "
         + resp + ", for the sole purpose of " + fin + ". "
         + "They are never sold, passed to third parties, or used for anything else. "
-        + "They are kept " + duree + ", then deleted.";
+        + "They are kept " + duree + ", then deleted. "
+        + (PROGRAMME.inscription.hebergement
+            ? PROGRAMME.inscription.hebergement.en : "");
       $("avisDroits").textContent =
         (verrou
           ? "Access to the programme requires this registration. "
@@ -1099,7 +1344,14 @@
 
     peindreFormulaire();
 
-    if (modeFormulaire()) {
+    if (modeBase()) {
+      /* Notre propre formulaire, qui parle directement à la base.
+         Le cadre Microsoft disparaît : il ne savait pas nous dire si
+         l'envoi avait eu lieu, et c'était tout le problème. */
+      $("cadreZone").hidden = true;
+      $("formInscription").hidden = false;
+
+    } else if (modeFormulaire()) {
       /* On ne charge le formulaire Microsoft QUE si on va l'afficher :
          inutile de solliciter le réseau d'un visiteur déjà enregistré. */
       $("formInscription").hidden = true;
@@ -1185,22 +1437,25 @@
       var d = {
         id: identifiant(),
         nom: $("fNom").value.trim(),
-        prenom: $("fPrenom").value.trim(),
         qualite: libelle,
         qualiteCle: cleQualite,
         precision: precision,
-        organisation: $("fOrganisation").value.trim(),
         email: $("fEmail").value.trim(),
+        telephone: $("fTel").value.trim(),
         langue: LANGUE,
         consentement: $("fConsent").checked,
         envoyeLe: new Date().toISOString()
       };
 
-      var probleme = !d.nom ? T.errNom
-                   : !d.prenom ? T.errPrenom
+      /* « Nom & Prénoms » en un seul champ : on exige au moins deux mots,
+         sinon la moitié des lignes n'aurait qu'un prénom. La base refait
+         le même contrôle de son côté. */
+      var deuxMots = d.nom.split(/\s+/).filter(function (x) { return x.length > 1; }).length >= 2;
+
+      var probleme = !deuxMots ? T.errNom
                    : !cleQualite ? T.errQualite
                    : (qualiteDemandePrecision(cleQualite) && !precision) ? T.errAutre
-                   : !emailPlausible(d.email) ? T.errEmail
+                   : (d.email && !emailPlausible(d.email)) ? T.errEmail
                    : !d.consentement ? T.errConsent
                    : null;
 
@@ -1215,11 +1470,15 @@
       bouton.disabled = true;
       bouton.textContent = T.formEnvoi;
 
-      envoyerInscription(d).then(function (ok) {
+      envoyerInscription(d).then(function (prog) {
         bouton.disabled = false;
         bouton.textContent = T.formEnvoyer;
 
-        if (ok) {
+        if (prog) {
+          /* La base a écrit la ligne ET renvoyé le programme.
+             On le garde sur l'appareil, puis on affiche l'agenda. */
+          garderProgramme(prog);
+          installerProgramme(prog);
           noterInscrit();
           $("inscrireBandeau").hidden = true;
           $("formInscription").hidden = true;
@@ -1229,15 +1488,10 @@
           return;
         }
 
-        /* Échec réseau. On garde l'inscription pour la renvoyer plus tard,
-           ET on laisse entrer : dans une salle saturée, refuser l'accès
-           à quelqu'un qui vient de remplir le formulaire serait absurde. */
-        var attente = lireAttente();
-        attente.push(d);
-        ecrireAttente(attente);
-        noterInscrit();
-        $("formFermer").hidden = false;
-        document.body.classList.remove("verrouille");
+        /* Sans réponse de la base, il n'y a tout simplement PAS de
+           programme à montrer : il n'existe plus nulle part ailleurs.
+           On ne peut donc pas « laisser entrer » comme avant — on
+           explique, et on invite à réessayer. */
         err.textContent = T.errReseau;
         err.hidden = false;
       });
@@ -1375,14 +1629,25 @@
 
     $("statusTitre").textContent = UI[LANGUE].chargement;
 
-    charger("programme.json").then(function (prog) {
-      if (!prog || !prog.jours || !prog.jours.length) {
+    charger("programme.json").then(function (conf) {
+      if (!conf || !conf.meta) {
         afficherErreur();
         return;
       }
 
-      PROGRAMME = preparer(prog);
-      jourActif = jourParDefaut();
+      /* programme.json ne contient PLUS les sessions : il ne garde que
+         l'habillage (titre, lieu, catégories) et les réglages. Les
+         sessions vivent dans la base, et n'en sortent qu'après un
+         enregistrement. C'est précisément ce qui rend le verrou réel :
+         il n'y a plus de fichier public à contourner. */
+      var garde = lireProgrammeGarde();
+      conf.jours = (garde && garde.jours) ? garde.jours : [];
+      if (garde && garde.meta && garde.meta.categories) {
+        conf.meta.categories = garde.meta.categories;
+      }
+
+      PROGRAMME = preparerOuVide(conf);
+      jourActif = PROGRAMME.jours.length ? jourParDefaut() : 0;
 
       peindreCadre();
       dessinerListe();
@@ -1425,6 +1690,19 @@
         }
         var n = noeudCible();
         if (n) n.li.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+
+      /* Un seul écouteur posé sur la liste entière, plutôt qu'un par
+         session : la liste est reconstruite à chaque changement de
+         langue ou de filtre, et des écouteurs individuels seraient
+         reposés — puis oubliés — à chaque fois. */
+      $("rail").addEventListener("click", function (e) {
+        var b = e.target.closest ? e.target.closest("button.ics") : null;
+        if (!b) return;
+        e.preventDefault();
+        var cle = b.getAttribute("data-ics");
+        var trouvee = toutesLesSessions().filter(function (x) { return x.cle === cle; })[0];
+        if (trouvee) telechargerIcs(trouvee);
       });
 
       window.addEventListener("scroll", majBoutonJump, { passive: true });

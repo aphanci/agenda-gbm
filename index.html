@@ -209,17 +209,14 @@
         <form class="form" id="formInscription" novalidate>
           <p class="form-intro" id="formIntro"></p>
 
-          <div class="duo">
-            <label class="champ">
-              <span class="champ-nom" id="labNom"></span>
-              <input type="text" id="fNom" name="nom" autocomplete="family-name" required>
-            </label>
-
-            <label class="champ">
-              <span class="champ-nom" id="labPrenom"></span>
-              <input type="text" id="fPrenom" name="prenom" autocomplete="given-name" required>
-            </label>
-          </div>
+          <!-- Les quatre champs reprennent EXACTEMENT le questionnaire :
+               nom et prénoms réunis, qualité, e-mail et téléphone
+               facultatifs. Un formulaire qui diverge de son questionnaire
+               produit deux jeux de données impossibles à rapprocher. -->
+          <label class="champ">
+            <span class="champ-nom" id="labNom"></span>
+            <input type="text" id="fNom" name="nom" autocomplete="name" required>
+          </label>
 
           <label class="champ">
             <span class="champ-nom" id="labQualite"></span>
@@ -232,13 +229,13 @@
           </label>
 
           <label class="champ">
-            <span class="champ-nom" id="labOrganisation"></span>
-            <input type="text" id="fOrganisation" name="organisation" autocomplete="organization">
+            <span class="champ-nom" id="labEmail"></span>
+            <input type="email" id="fEmail" name="email" autocomplete="email" inputmode="email">
           </label>
 
           <label class="champ">
-            <span class="champ-nom" id="labEmail"></span>
-            <input type="email" id="fEmail" name="email" autocomplete="email" inputmode="email" required>
+            <span class="champ-nom" id="labTel"></span>
+            <input type="tel" id="fTel" name="telephone" autocomplete="tel" inputmode="tel">
           </label>
 
           <!-- L'avis de confidentialité, écrit depuis programme.json -->

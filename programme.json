@@ -21,52 +21,86 @@
     "lieuComplet": "Patinoire, Sofitel Abidjan Hôtel Ivoire, Cocody, Abidjan",
     "categories": {
       "ceremonie": {
-        "libelle": { "fr": "Ouverture officielle", "en": "Official opening" },
+        "libelle": {
+          "fr": "Ouverture officielle",
+          "en": "Official opening"
+        },
         "priorite": 2
       },
       "parallele": {
-        "libelle": { "fr": "Activité parallèle", "en": "Parallel session" },
+        "libelle": {
+          "fr": "Activité parallèle",
+          "en": "Parallel session"
+        },
         "priorite": 2
       },
       "permanent": {
-        "libelle": { "fr": "Espaces permanents", "en": "Permanent spaces" },
+        "libelle": {
+          "fr": "Espaces permanents",
+          "en": "Permanent spaces"
+        },
         "priorite": 1
       },
       "jalon": {
-        "libelle": { "fr": "Jalon", "en": "Milestone" },
+        "libelle": {
+          "fr": "Jalon",
+          "en": "Milestone"
+        },
         "priorite": 0,
         "estJalon": true
       }
+    },
+    "dates": {
+      "fr": "Lun. 21 sept. – Mar. 22 sept. 2026",
+      "en": "Mon 21 – Tue 22 Sept 2026"
     }
   },
-
   "inscription": {
     "active": true,
-
-    "_mode": "formulaire = un formulaire Microsoft Forms dans un cadre. flux = le formulaire maison qui envoie a Power Automate (bloque par la politique de securite, garde pour plus tard).",
-    "mode": "formulaire",
-
-    "_a_completer": "Coller l'adresse du formulaire Microsoft (celle qui contient &embed=true). Tant qu'elle est vide, ni formulaire ni verrou ne s'affichent : le site reste consultable.",
-    "formulaireUrl": "https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=wP6iMWsmZ0y1bieW2PWcNjfI8lR4-KtIikWYYV8mp81URFo0NVJCSERNWFY1T0QzWE9HNDhGQkg4Si4u&embed=true",
-
-    "_url": "Pour le jour ou le flux Power Automate sera autorise. Sert uniquement si mode vaut flux.",
+    "_mode": "base = notre formulaire parle a Supabase, et le programme ne revient qu'apres enregistrement. formulaire = ancien cadre Microsoft. flux = ancien Power Automate.",
+    "mode": "base",
+    "_base": "Adresse du projet Supabase et cle PUBLIQUE (anon). Cette cle est faite pour vivre dans une page web : elle n'ouvre QUE la fonction enregistrer. Ne jamais mettre ici la cle service_role.",
+    "baseUrl": "https://iccoapbaonfkohsjfimf.supabase.co",
+    "baseCle": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImljY29hcGJhb25ma29oc2pmaW1mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MzgxMjYsImV4cCI6MjEwNTUxNDEyNn0.hIziG6Acg-tPmEb0A3gGoh5zeP-dnwNioYvw--FPyVE",
+    "formulaireUrl": "",
     "url": "",
-
     "contact": "mkouabenan@worldbankgroup.org",
-
     "_obligatoire": "true = l'agenda n'est lisible qu'apres enregistrement. false = simple invitation, agenda libre.",
     "obligatoire": true,
-
     "_qualites": "Utilisees par le formulaire maison (mode flux). En mode formulaire, les memes six categories sont a saisir dans Microsoft Forms.",
     "qualites": [
-      { "cle": "etudiant",  "fr": "Étudiant(e) ou élève",                              "en": "Student or pupil" },
-      { "cle": "ministere", "fr": "Ministère ou administration",                        "en": "Ministry or public administration" },
-      { "cle": "projet",    "fr": "Projet financé par la Banque mondiale",              "en": "World Bank–financed project" },
-      { "cle": "ptf",       "fr": "Partenaire technique et financier",                  "en": "Technical and financial partner" },
-      { "cle": "prive",     "fr": "Entreprise, presse ou société civile",               "en": "Company, press or civil society" },
-      { "cle": "autre",     "fr": "Autre visiteur",                                     "en": "Other visitor", "champLibre": true }
+      {
+        "cle": "etudiant",
+        "fr": "Étudiant(e) ou élève",
+        "en": "Student or pupil"
+      },
+      {
+        "cle": "ministere",
+        "fr": "Ministère ou administration",
+        "en": "Ministry or public administration"
+      },
+      {
+        "cle": "projet",
+        "fr": "Projet financé par la Banque mondiale",
+        "en": "World Bank–financed project"
+      },
+      {
+        "cle": "ptf",
+        "fr": "Partenaire technique et financier",
+        "en": "Technical and financial partner"
+      },
+      {
+        "cle": "prive",
+        "fr": "Entreprise, presse ou société civile",
+        "en": "Company, press or civil society"
+      },
+      {
+        "cle": "autre",
+        "fr": "Autre visiteur",
+        "en": "Other visitor",
+        "champLibre": true
+      }
     ],
-
     "responsable": {
       "fr": "le bureau de la Banque mondiale en Côte d'Ivoire",
       "en": "the World Bank office in Côte d'Ivoire"
@@ -78,337 +112,11 @@
     "conservation": {
       "fr": "12 mois après l'événement",
       "en": "12 months after the event"
+    },
+    "hebergement": {
+      "fr": "Pour la durée de l'événement, ces informations sont hébergées chez un prestataire technique externe, puis exportées et supprimées de cet hébergement.",
+      "en": "For the duration of the event, this information is hosted by an external technical provider, then exported and deleted from that hosting."
     }
   },
-
-  "jours": [
-    {
-      "id": "j1",
-      "date": "2026-09-21",
-      "libelle": { "fr": "Jour 1", "en": "Day 1" },
-      "dateCourte": { "fr": "Lun. 21 sept.", "en": "Mon 21 Sept" },
-      "sousTitre": {
-        "fr": "Lancement, Résultats et Découverte",
-        "en": "Launch, Results and Discovery"
-      },
-      "sessions": [
-        {
-          "debut": "09:30",
-          "fin": "10:00",
-          "categorie": "ceremonie",
-          "titre": {
-            "fr": "Accueil des invités",
-            "en": "Welcome of guests"
-          },
-          "details": {
-            "fr": ["Réception protocolaire et installation"],
-            "en": ["Protocol reception and seating"]
-          }
-        },
-        {
-          "debut": "10:00",
-          "fin": "10:10",
-          "categorie": "ceremonie",
-          "titre": {
-            "fr": "Groupe de la Banque mondiale : qui sommes-nous ?",
-            "en": "The World Bank Group: who are we?"
-          }
-        },
-        {
-          "debut": "10:10",
-          "fin": "10:45",
-          "categorie": "ceremonie",
-          "titre": {
-            "fr": "Perception et réalité du Groupe de la Banque mondiale, et sa valeur ajoutée à la création d'emplois",
-            "en": "Perception and reality of the World Bank Group, and its added value for job creation"
-          },
-          "resume": {
-            "fr": "De la stratégie à l'action pour un impact à échelle",
-            "en": "From strategy to action for impact at scale"
-          }
-        },
-        {
-          "debut": "10:45",
-          "fin": "11:05",
-          "categorie": "ceremonie",
-          "titre": {
-            "fr": "Allocutions officielles et photo de famille",
-            "en": "Official addresses and group photograph"
-          },
-          "intervenants": [
-            {
-              "nom": { "fr": "Groupe de la Banque mondiale", "en": "World Bank Group" },
-              "role": { "fr": "Allocution", "en": "Address" }
-            },
-            {
-              "nom": {
-                "fr": "Ministre de l'Économie, des Finances et du Budget",
-                "en": "Minister of Economy, Finance and Budget"
-              },
-              "role": { "fr": "Allocution d'ouverture", "en": "Opening address" }
-            }
-          ],
-          "details": {
-            "fr": ["Photo officielle"],
-            "en": ["Official photograph"]
-          }
-        },
-        {
-          "debut": "11:05",
-          "fin": "11:25",
-          "categorie": "ceremonie",
-          "titre": {
-            "fr": "Échanges avec la presse",
-            "en": "Press briefing"
-          }
-        },
-        {
-          "debut": "11:25",
-          "fin": "11:50",
-          "categorie": "ceremonie",
-          "titre": {
-            "fr": "Visite guidée des stands",
-            "en": "Guided tour of the stands"
-          },
-          "details": {
-            "fr": ["Tour des espaces d'exposition pour les officiels et les participants à la cérémonie de lancement"],
-            "en": ["Tour of the exhibition areas for officials and launch-ceremony guests"]
-          }
-        },
-        {
-          "debut": "13:00",
-          "fin": "14:15",
-          "categorie": "parallele",
-          "titre": {
-            "fr": "Agribusiness et foncier rural, vers une transformation créatrice d'emplois en Côte d'Ivoire",
-            "en": "Agribusiness and rural land tenure: towards a job-creating transformation in Côte d'Ivoire"
-          },
-          "intervenants": [
-            {
-              "nom": { "fr": "M. Bruno Koné", "en": "Mr Bruno Koné" },
-              "role": {
-                "fr": "Ministre de l'Agriculture, du Développement rural et des Productions vivrières",
-                "en": "Minister of Agriculture, Rural Development and Food Production"
-              }
-            },
-            {
-              "nom": { "fr": "M. Marc Koffi Gnalhey", "en": "Mr Marc Koffi Gnalhey" },
-              "role": {
-                "fr": "Directeur général par intérim, Agence Foncière Rurale",
-                "en": "Acting Director General, Agence Foncière Rurale"
-              }
-            },
-            {
-              "nom": { "fr": "Mme Mélanie Ahoba", "en": "Ms Mélanie Ahoba" },
-              "role": { "fr": "Banque mondiale", "en": "World Bank" }
-            }
-          ]
-        },
-        {
-          "debut": "13:00",
-          "fin": "17:00",
-          "categorie": "permanent",
-          "titre": {
-            "fr": "Ouverture des stands au grand public",
-            "en": "Stands open to the general public"
-          },
-          "details": {
-            "fr": [
-              "Visite des stands des projets financés par le Groupe de la Banque mondiale : expositions, démonstrations, échanges avec les équipes",
-              "Village d'Impact : espace dédié aux bénéficiaires des projets — expositions, ventes, démonstrations, mise en contact avec partenaires, médias et visiteurs",
-              "Stand GBM : échanges avec les équipes du Groupe de la Banque mondiale"
-            ],
-            "en": [
-              "Visit the stands of World Bank Group–financed projects: exhibits, demonstrations, meetings with project teams",
-              "Impact Village: a space for project beneficiaries — exhibits, sales, demonstrations, introductions to partners, media and visitors",
-              "WBG stand: meet the World Bank Group teams"
-            ]
-          }
-        },
-        {
-          "debut": "14:45",
-          "fin": "16:00",
-          "categorie": "parallele",
-          "titre": {
-            "fr": "Financer le secteur privé pour le développement et l'emploi : l'impact de la Société Financière Internationale (IFC) en Côte d'Ivoire",
-            "en": "Financing the private sector for development and jobs: the impact of the International Finance Corporation (IFC) in Côte d'Ivoire"
-          },
-          "intervenants": [
-            {
-              "nom": {
-                "fr": "Société Financière Internationale (SFI / IFC)",
-                "en": "International Finance Corporation (IFC)"
-              },
-              "role": { "fr": "Session animée par", "en": "Session hosted by" }
-            },
-            {
-              "nom": {
-                "fr": "Représentants du secteur privé",
-                "en": "Private-sector representatives"
-              }
-            },
-            {
-              "nom": {
-                "fr": "Représentants du gouvernement",
-                "en": "Government representatives"
-              }
-            }
-          ]
-        },
-        {
-          "debut": "16:15",
-          "fin": "17:15",
-          "categorie": "parallele",
-          "titre": {
-            "fr": "L'eau, un enjeu essentiel pour une croissance inclusive en Côte d'Ivoire",
-            "en": "Water, a key issue for inclusive growth in Côte d'Ivoire"
-          },
-          "resume": {
-            "fr": "Garantir la disponibilité, l'accès et la sécurité de l'eau pour les populations et l'économie",
-            "en": "Securing the availability, access and safety of water for people and the economy"
-          },
-          "intervenants": [
-            {
-              "nom": { "fr": "Dr Amédé Koffi Kouakou", "en": "Dr Amédé Koffi Kouakou" },
-              "role": {
-                "fr": "Ministre de l'Hydraulique, de l'Assainissement et de la Salubrité",
-                "en": "Minister of Water Resources, Sanitation and Public Health"
-              }
-            }
-          ]
-        },
-        {
-          "debut": "17:45",
-          "fin": "17:45",
-          "categorie": "jalon",
-          "titre": {
-            "fr": "Fin des activités de la première journée",
-            "en": "End of day one"
-          }
-        }
-      ]
-    },
-
-    {
-      "id": "j2",
-      "date": "2026-09-22",
-      "libelle": { "fr": "Jour 2", "en": "Day 2" },
-      "dateCourte": { "fr": "Mar. 22 sept.", "en": "Tue 22 Sept" },
-      "sousTitre": {
-        "fr": "Mobilité, Entreprises et Opportunités pour les Jeunes",
-        "en": "Mobility, Enterprise and Opportunities for Young People"
-      },
-      "sessions": [
-        {
-          "debut": "09:30",
-          "fin": "17:00",
-          "categorie": "permanent",
-          "titre": {
-            "fr": "Ouverture des stands au grand public",
-            "en": "Stands open to the general public"
-          },
-          "details": {
-            "fr": [
-              "Visite des stands des projets financés par le Groupe de la Banque mondiale : expositions, démonstrations, échanges avec les équipes",
-              "Village d'Impact : espace dédié aux bénéficiaires des projets — expositions, ventes, démonstrations, mise en contact avec partenaires, médias et visiteurs",
-              "Stand GBM : échanges avec les équipes du Groupe de la Banque mondiale"
-            ],
-            "en": [
-              "Visit the stands of World Bank Group–financed projects: exhibits, demonstrations, meetings with project teams",
-              "Impact Village: a space for project beneficiaries — exhibits, sales, demonstrations, introductions to partners, media and visitors",
-              "WBG stand: meet the World Bank Group teams"
-            ]
-          }
-        },
-        {
-          "debut": "10:00",
-          "fin": "11:15",
-          "categorie": "parallele",
-          "titre": {
-            "fr": "Énergie et emplois : le double défi de la transition",
-            "en": "Energy and jobs: the twin challenge of the transition"
-          },
-          "resume": {
-            "fr": "Moteur de l'économie et source de nouvelles opportunités en Côte d'Ivoire. Dialogue multi-acteurs sur la problématique du secteur de l'énergie.",
-            "en": "An engine of the economy and a source of new opportunities in Côte d'Ivoire. Multi-stakeholder dialogue on the energy sector."
-          },
-          "intervenants": [
-            { "nom": { "fr": "Gouvernement de Côte d'Ivoire", "en": "Government of Côte d'Ivoire" } },
-            { "nom": { "fr": "Banque mondiale", "en": "World Bank" } },
-            { "nom": { "fr": "Société Financière Internationale (SFI)", "en": "International Finance Corporation (IFC)" } },
-            { "nom": { "fr": "MIGA", "en": "MIGA" } },
-            { "nom": { "fr": "Secteur privé", "en": "Private sector" } }
-          ]
-        },
-        {
-          "debut": "11:30",
-          "fin": "13:45",
-          "categorie": "parallele",
-          "titre": {
-            "fr": "Mini-sommet carrière avec les universités",
-            "en": "Careers mini-summit with the universities"
-          },
-          "details": {
-            "fr": ["INPHB-Yakro, ENSEA, Université Nangui Abrogoua, UFHB…"],
-            "en": ["INPHB-Yakro, ENSEA, Université Nangui Abrogoua, UFHB…"]
-          },
-          "resume": {
-            "fr": "Offrir aux jeunes une occasion de découvrir les métiers et compétences mobilisés dans le domaine du développement, et d'échanger sur les perspectives professionnelles au sein du Groupe de la Banque mondiale.",
-            "en": "Giving young people a chance to discover the roles and skills that development work calls for, and to discuss career prospects within the World Bank Group."
-          }
-        },
-        {
-          "debut": "14:00",
-          "fin": "15:00",
-          "categorie": "parallele",
-          "titre": {
-            "fr": "CMU : comment passer de la couverture à l'accès aux soins de qualité ?",
-            "en": "Universal health coverage: from coverage to access to quality care"
-          },
-          "resume": {
-            "fr": "Conversation avec le Ministre",
-            "en": "A conversation with the Minister"
-          },
-          "intervenants": [
-            {
-              "nom": { "fr": "Me Adama Kamara", "en": "Me Adama Kamara" },
-              "role": {
-                "fr": "Ministre de l'Emploi, de la Protection Sociale et de la Formation Professionnelle",
-                "en": "Minister of Employment, Social Protection and Vocational Training"
-              }
-            }
-          ]
-        },
-        {
-          "debut": "15:00",
-          "fin": "16:15",
-          "categorie": "parallele",
-          "titre": {
-            "fr": "Investir dans les femmes pour plus d'emplois productifs",
-            "en": "Investing in women for more productive jobs"
-          },
-          "resume": {
-            "fr": "Santé, éducation, compétences : les leviers pour libérer leur potentiel économique. Dialogue multi-acteurs sur le capital humain.",
-            "en": "Health, education, skills: the levers to unlock women's economic potential. Multi-stakeholder dialogue on human capital."
-          },
-          "intervenants": [
-            { "nom": { "fr": "Gouvernement de Côte d'Ivoire", "en": "Government of Côte d'Ivoire" } },
-            { "nom": { "fr": "Banque mondiale", "en": "World Bank" } },
-            { "nom": { "fr": "Société Financière Internationale (IFC)", "en": "International Finance Corporation (IFC)" } },
-            { "nom": { "fr": "MIGA", "en": "MIGA" } },
-            { "nom": { "fr": "Secteur privé", "en": "Private sector" } }
-          ]
-        },
-        {
-          "debut": "17:30",
-          "fin": "17:30",
-          "categorie": "jalon",
-          "titre": {
-            "fr": "Clôture officielle des Journées Portes Ouvertes et cocktail",
-            "en": "Official closing of the Open Days and cocktail reception"
-          }
-        }
-      ]
-    }
-  ]
+  "_jours": "Les sessions ne sont plus ici : elles vivent dans la base Supabase et ne sont remises qu'apres enregistrement. C'est ce qui rend le verrou reel."
 }
