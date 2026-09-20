@@ -935,7 +935,15 @@
      • Déjà installée, ou sur ordinateur — on n'affiche rien.
      ============================================================ */
   var evenementInstall = null;
-  var CLE_INSTALL = "agenda-install-masque";
+  /* Le nom de cette clé porte un numéro, et ce numéro vient de changer.
+     Raison : un visiteur qui a appuyé une fois sur la croix du bandeau
+     pendant les essais l'a fait taire DÉFINITIVEMENT sur son téléphone.
+     Impossible de savoir, à distance, si un bandeau manquant vient du
+     code ou de cette croix. En changeant le nom de la clé, les refus
+     posés pendant les essais ne correspondent plus à rien : chaque
+     téléphone repart avec un bandeau visible, et la croix continue de
+     fonctionner normalement pour la suite. */
+  var CLE_INSTALL = "agenda-install-masque-2";
 
   /* La page tourne-t-elle déjà depuis l'écran d'accueil ? */
   function dejaInstallee() {
@@ -1464,8 +1472,8 @@
         + "collectés par " + resp + ", dans le seul but de " + fin + ". "
         + "Ils ne sont ni vendus, ni cédés à des tiers, ni utilisés à d'autres fins. "
         + "Ils sont conservés " + duree + ", puis supprimés. "
-        + (PROGRAMME.inscription.hebergement
-            ? PROGRAMME.inscription.hebergement.fr : "");
+        + (PROGRAMME.inscription
+            ? PROGRAMME.inscription.fr : "");
       $("avisDroits").textContent =
         (verrou
           ? "L'accès au programme suppose cet enregistrement. "
@@ -1479,8 +1487,8 @@
         + resp + ", for the sole purpose of " + fin + ". "
         + "They are never sold, passed to third parties, or used for anything else. "
         + "They are kept " + duree + ", then deleted. "
-        + (PROGRAMME.inscription.hebergement
-            ? PROGRAMME.inscription.hebergement.en : "");
+        + (PROGRAMME.inscription
+            ? PROGRAMME.inscription.en : "");
       $("avisDroits").textContent =
         (verrou
           ? "Access to the programme requires this registration. "

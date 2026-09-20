@@ -4,6 +4,7 @@
   "description": "L'agenda en direct des Journées Portes Ouvertes du Groupe de la Banque mondiale en Côte d'Ivoire.",
   "lang": "fr",
   "dir": "ltr",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
@@ -29,5 +30,5 @@
       "purpose": "maskable"
     }
   ],
-  "_start_url": "Volontairement absent. Avec un start_url, iOS ouvre TOUJOURS cette adresse fixe et perd le jeton d'enregistrement inscrit dans l'adresse. Sans lui, l'icone nait avec l'adresse affichee au moment de l'ajout, jeton compris — c'est le seul pont entre Safari et l'ecran d'accueil."
+  "_note_start_url": "start_url avait ete retire pour tenter de faire passer un jeton d'enregistrement de Safari vers l'ecran d'accueil sur iPhone. Cette piste a ete abandonnee : elle ne fonctionnait pas, et son retrait avait un cout reel — sans start_url, Chrome ne considere plus la page comme installable, n'emet plus l'evenement beforeinstallprompt, et le bandeau Installer d'Android disparait. Il est donc retabli. NE PAS le retirer a nouveau."
 }
