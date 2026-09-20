@@ -1298,8 +1298,8 @@
         + "collectés par " + resp + ", dans le seul but de " + fin + ". "
         + "Ils ne sont ni vendus, ni cédés à des tiers, ni utilisés à d'autres fins. "
         + "Ils sont conservés " + duree + ", puis supprimés. "
-        + (PROGRAMME.inscription.hebergement
-            ? PROGRAMME.inscription.hebergement.fr : "");
+        + (PROGRAMME.inscription
+            ? PROGRAMME.inscription.fr : "");
       $("avisDroits").textContent =
         (verrou
           ? "L'accès au programme suppose cet enregistrement. "
@@ -1313,8 +1313,8 @@
         + resp + ", for the sole purpose of " + fin + ". "
         + "They are never sold, passed to third parties, or used for anything else. "
         + "They are kept " + duree + ", then deleted. "
-        + (PROGRAMME.inscription.hebergement
-            ? PROGRAMME.inscription.hebergement.en : "");
+        + (PROGRAMME.inscription
+            ? PROGRAMME.inscription.en : "");
       $("avisDroits").textContent =
         (verrou
           ? "Access to the programme requires this registration. "
