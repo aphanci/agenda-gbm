@@ -37,6 +37,7 @@
       mesSessions: "Mes sessions", toutAgenda: "Tout l'agenda",
       jumpLabel: "Aller à maintenant",
       statutVerrou: "Enregistrez-vous pour ouvrir le programme",
+      astuceInstall: "Conseil : ajoutez d'abord l'agenda à votre écran d'accueil, puis enregistrez-vous depuis l'icône. Vous n'aurez à le faire qu'une seule fois.",
       themeClair: "Affichage clair", themeSombre: "Affichage sombre",
       intervenants: "Intervenants", ajouterAgenda: "Ajouter à mon agenda",
       calApple: "iPhone, Apple Calendrier — et tout autre agenda",
@@ -114,6 +115,7 @@
       mesSessions: "My sessions", toutAgenda: "Full agenda",
       jumpLabel: "Jump to now",
       statutVerrou: "Register to open the programme",
+      astuceInstall: "Tip: add the agenda to your home screen first, then register from the icon. You will only have to do it once.",
       themeClair: "Light display", themeSombre: "Dark display",
       intervenants: "Speakers", ajouterAgenda: "Add to my calendar",
       calApple: "iPhone, Apple Calendar — and any other calendar",
@@ -1034,6 +1036,18 @@
   }
 
   function estInscrit() {
+    /* EN MODE BASE, la question n'est pas « a-t-on coché quelque part ? »
+       mais « a-t-on le programme ? ».
+
+       La nuance a failli coûter cher : les téléphones qui avaient ouvert
+       l'agenda AVANT la bascule portaient encore la marque « inscrit »
+       des versions précédentes. Le widget leur épargnait donc le
+       formulaire — alors qu'ils n'avaient aucun programme, et aucun
+       moyen d'en obtenir un. Écran vide, sans issue.
+
+       En liant l'état à la seule chose qui compte vraiment, ces
+       appareils repassent naturellement par l'enregistrement. */
+    if (modeBase()) return !!lireProgrammeGarde();
     try { return localStorage.getItem(CLE_INSCRIT) === "1"; } catch (e) { return false; }
   }
   function noterInscrit() {
@@ -1236,6 +1250,18 @@
 
     $("formTitre").textContent = T.formTitre;
     $("formIntro").textContent = verrouActif() ? T.formIntroVerrou : T.formIntro;
+
+    /* Sur iPhone, l'application posée sur l'écran d'accueil ne partage
+       pas sa mémoire avec Safari : s'enregistrer d'abord puis installer
+       oblige à recommencer. Dans l'autre sens, une seule fois suffit.
+       On le dit AVANT le formulaire — après, il est trop tard. */
+    var dejaPose = false;
+    try {
+      dejaPose = window.matchMedia("(display-mode: standalone)").matches
+                 || window.navigator.standalone === true;
+    } catch (e) { }
+    $("astuceInstall").hidden = dejaPose;
+    $("astuceInstall").textContent = T.astuceInstall;
     $("labNom").textContent = T.labNom;
     $("labQualite").textContent = T.labQualite;
     $("labAutre").textContent = T.labAutre;

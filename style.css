@@ -1068,3 +1068,66 @@ body.verrouille { overflow: hidden; }
   color: var(--encre-2);
   text-align: center;
 }
+
+/* ---------- 14. LE CHOIX DE L'AGENDA ----------
+   Cinq destinations au lieu d'une : Google seul laissait de côté tous
+   les visiteurs sous Outlook, Apple ou Yahoo. Le <details> natif gère
+   l'ouverture, le clavier et la lecture vocale sans une ligne de code. */
+.agenda-choix { margin-top: 10px; }
+.agenda-choix summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  padding: 4px 0;
+}
+.agenda-choix summary::-webkit-details-marker { display: none; }
+.agenda-choix summary::marker { content: ""; }
+.agenda-choix[open] summary { margin-bottom: 8px; }
+
+.agenda-choix ul {
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border: 1px solid var(--filet);
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+.agenda-choix li + li { border-top: 1px solid var(--filet-doux); }
+.agenda-choix a,
+.agenda-choix button.ics {
+  display: block;
+  width: 100%;
+  text-align: left;
+  appearance: none;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  line-height: 1.35;
+  color: var(--encre);
+  text-decoration: none;
+  padding: 11px 10px;
+  border-radius: 5px;
+}
+.agenda-choix a:hover,
+.agenda-choix button.ics:hover { background: var(--surface); }
+/* La première entrée est la seule universelle : on la distingue. */
+.agenda-choix button.ics { font-weight: 600; color: var(--accent); }
+
+/* Le conseil d'installation, posé avant le formulaire. */
+.astuce {
+  margin: 0 0 16px;
+  padding: 11px 13px;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 7px 7px 0;
+  background: var(--accent-fond);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--encre-2);
+}
