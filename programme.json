@@ -1,6 +1,6 @@
 {
   "meta": {
-    "version": "2026-09-15",
+    "version": "2026-09-20",
     "utcOffset": "+00:00",
     "titre": {
       "fr": "Le Groupe de la Banque mondiale en action en Côte d'Ivoire",
@@ -97,8 +97,8 @@
           "fin": "10:00",
           "categorie": "ceremonie",
           "titre": {
-            "fr": "Accueil des participants",
-            "en": "Welcome of participants"
+            "fr": "Accueil des invités",
+            "en": "Welcome of guests"
           },
           "details": {
             "fr": ["Réception protocolaire et installation"],
@@ -115,7 +115,7 @@
           }
         },
         {
-          "debut": "10:25",
+          "debut": "10:10",
           "fin": "10:45",
           "categorie": "ceremonie",
           "titre": {
@@ -139,16 +139,6 @@
             {
               "nom": { "fr": "Groupe de la Banque mondiale", "en": "World Bank Group" },
               "role": { "fr": "Allocution", "en": "Address" }
-            },
-            {
-              "nom": {
-                "fr": "Ministre du Plan et du Développement",
-                "en": "Minister of Planning and Development"
-              },
-              "role": {
-                "fr": "Gouverneur du Groupe de la Banque mondiale",
-                "en": "Governor for the World Bank Group"
-              }
             },
             {
               "nom": {
@@ -195,11 +185,11 @@
           },
           "intervenants": [
             {
-              "nom": {
+              "nom": { "fr": "M. Bruno Koné", "en": "Mr Bruno Koné" },
+              "role": {
                 "fr": "Ministre de l'Agriculture, du Développement rural et des Productions vivrières",
                 "en": "Minister of Agriculture, Rural Development and Food Production"
-              },
-              "role": { "fr": "ou son délégué", "en": "or their representative" }
+              }
             },
             {
               "nom": { "fr": "M. Marc Koffi Gnalhey", "en": "Mr Marc Koffi Gnalhey" },
@@ -209,17 +199,13 @@
               }
             },
             {
-              "nom": { "fr": "M. Nouhoum Traoré", "en": "Mr Nouhoum Traoré" },
-              "role": { "fr": "Banque mondiale", "en": "World Bank" }
-            },
-            {
               "nom": { "fr": "Mme Mélanie Ahoba", "en": "Ms Mélanie Ahoba" },
               "role": { "fr": "Banque mondiale", "en": "World Bank" }
             }
           ]
         },
         {
-          "debut": "14:00",
+          "debut": "13:00",
           "fin": "17:00",
           "categorie": "permanent",
           "titre": {
@@ -270,21 +256,30 @@
           ]
         },
         {
-          "debut": "15:00",
-          "fin": "16:30",
+          "debut": "16:15",
+          "fin": "17:15",
           "categorie": "parallele",
           "titre": {
-            "fr": "Visite guidée des universités et établissements scolaires",
-            "en": "Guided visit for universities and schools"
+            "fr": "L'eau, un enjeu essentiel pour une croissance inclusive en Côte d'Ivoire",
+            "en": "Water, a key issue for inclusive growth in Côte d'Ivoire"
           },
-          "details": {
-            "fr": ["Rencontre avec la jeunesse et découverte des projets"],
-            "en": ["Meeting young people and discovering the projects"]
-          }
+          "resume": {
+            "fr": "Garantir la disponibilité, l'accès et la sécurité de l'eau pour les populations et l'économie",
+            "en": "Securing the availability, access and safety of water for people and the economy"
+          },
+          "intervenants": [
+            {
+              "nom": { "fr": "Dr Amédé Koffi Kouakou", "en": "Dr Amédé Koffi Kouakou" },
+              "role": {
+                "fr": "Ministre de l'Hydraulique, de l'Assainissement et de la Salubrité",
+                "en": "Minister of Water Resources, Sanitation and Public Health"
+              }
+            }
+          ]
         },
         {
-          "debut": "17:00",
-          "fin": "17:00",
+          "debut": "17:45",
+          "fin": "17:45",
           "categorie": "jalon",
           "titre": {
             "fr": "Fin des activités de la première journée",
@@ -346,27 +341,43 @@
           ]
         },
         {
-          "debut": "12:00",
-          "fin": "14:30",
+          "debut": "11:30",
+          "fin": "13:45",
           "categorie": "parallele",
           "titre": {
             "fr": "Mini-sommet carrière avec les universités",
             "en": "Careers mini-summit with the universities"
           },
           "details": {
-            "fr": [
-              "INPHB-Yakro, ENSEA, Université Nangui Abrogoua, UFHB…",
-              "Visite guidée des établissements scolaires"
-            ],
-            "en": [
-              "INPHB-Yakro, ENSEA, Université Nangui Abrogoua, UFHB…",
-              "Guided visit of the participating schools"
-            ]
+            "fr": ["INPHB-Yakro, ENSEA, Université Nangui Abrogoua, UFHB…"],
+            "en": ["INPHB-Yakro, ENSEA, Université Nangui Abrogoua, UFHB…"]
           },
           "resume": {
-            "fr": "Permettre aux jeunes élèves de comprendre les enjeux de développement de leur pays et les liens entre leur formation, les compétences recherchées et les perspectives professionnelles.",
-            "en": "Helping young students understand their country's development challenges and the links between their studies, the skills employers seek and career prospects."
+            "fr": "Offrir aux jeunes une occasion de découvrir les métiers et compétences mobilisés dans le domaine du développement, et d'échanger sur les perspectives professionnelles au sein du Groupe de la Banque mondiale.",
+            "en": "Giving young people a chance to discover the roles and skills that development work calls for, and to discuss career prospects within the World Bank Group."
           }
+        },
+        {
+          "debut": "14:00",
+          "fin": "15:00",
+          "categorie": "parallele",
+          "titre": {
+            "fr": "CMU : comment passer de la couverture à l'accès aux soins de qualité ?",
+            "en": "Universal health coverage: from coverage to access to quality care"
+          },
+          "resume": {
+            "fr": "Conversation avec le Ministre",
+            "en": "A conversation with the Minister"
+          },
+          "intervenants": [
+            {
+              "nom": { "fr": "Me Adama Kamara", "en": "Me Adama Kamara" },
+              "role": {
+                "fr": "Ministre de l'Emploi, de la Protection Sociale et de la Formation Professionnelle",
+                "en": "Minister of Employment, Social Protection and Vocational Training"
+              }
+            }
+          ]
         },
         {
           "debut": "15:00",
