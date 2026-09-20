@@ -1256,6 +1256,59 @@
     });
   }
 
+  var CLE_JETON = "agenda-jeton";
+
+  /* ---------- LE JETON DE REPRISE ----------
+     Sur iPhone, l'application de l'écran d'accueil ne partage avec
+     Safari ni localStorage, ni les cookies, ni le cache : Apple
+     cloisonne tout. La SEULE chose qui franchit la frontière est
+     L'ADRESSE — iOS retient celle qui est affichée au moment où l'on
+     ajoute la page à l'écran d'accueil.
+
+     On inscrit donc le jeton dans l'adresse après l'enregistrement.
+     L'icône naît avec lui, et peut redemander le programme sans créer
+     une seconde inscription. */
+  function poserJetonDansAdresse(jeton) {
+    try {
+      if (!jeton || !window.history || !history.replaceState) return;
+      var u = new URL(window.location.href);
+      u.searchParams.set("j", jeton);
+      history.replaceState(null, "", u.toString());
+      localStorage.setItem(CLE_JETON, jeton);
+    } catch (e) { }
+  }
+
+  function jetonConnu() {
+    try {
+      var p = new URLSearchParams(window.location.search).get("j");
+      if (p) return p;
+      return localStorage.getItem(CLE_JETON) || null;
+    } catch (e) { return null; }
+  }
+
+  /* Redemande le programme avec le jeton. Aucune ligne n'est créée :
+     la base vérifie seulement que ce jeton correspond bien à une
+     inscription existante. */
+  function reprendreAvecJeton(c, jeton) {
+    if (!jeton || !c || !c.baseUrl || !c.baseCle) return Promise.resolve(null);
+
+    return fetch(c.baseUrl.replace(/\/+$/, "") + "/rest/v1/rpc/reprendre", {
+      method: "POST",
+      headers: {
+        "apikey": c.baseCle,
+        "Authorization": "Bearer " + c.baseCle,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ p_jeton: jeton })
+    })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (p) { return (p && p.jours && p.jours.length) ? p : null; })
+      .catch(function (e) {
+        console.warn("Reprise par jeton impossible :", e.message);
+        return null;
+      });
+  }
+
   function garderProgramme(prog) {
     try { localStorage.setItem(CLE_PROG, JSON.stringify(prog)); } catch (e) { }
     partagerProgramme(prog);
@@ -1617,6 +1670,7 @@
           /* La base a écrit la ligne ET renvoyé le programme.
              On le garde sur l'appareil, puis on affiche l'agenda. */
           garderProgramme(prog);
+          poserJetonDansAdresse(prog.jeton);
           installerProgramme(prog);
           noterInscrit();
           $("inscrireBandeau").hidden = true;
@@ -1787,7 +1841,23 @@
         if (!lireProgrammeGarde() && partage) {
           try { localStorage.setItem(CLE_PROG, JSON.stringify(partage)); } catch (e) { }
         }
-        return suiteDuDemarrage(conf, garde);
+        if (garde) return suiteDuDemarrage(conf, garde);
+
+        /* Aucun programme sur cet appareil — mais peut-être un jeton
+           dans l'adresse, hérité de l'installation depuis Safari. On
+           le présente à la base : si l'inscription existe, elle rend
+           le programme SANS en créer une seconde. */
+        var j = jetonConnu();
+        if (!j) return suiteDuDemarrage(conf, null);
+
+        return reprendreAvecJeton(conf.inscription, j).then(function (repris) {
+          if (repris) {
+            try { localStorage.setItem(CLE_PROG, JSON.stringify(repris)); } catch (e) { }
+            try { localStorage.setItem(CLE_JETON, j); } catch (e) { }
+            partagerProgramme(repris);
+          }
+          return suiteDuDemarrage(conf, repris || null);
+        });
       });
     }).catch(function (e) {
       /* Le filet. Sans lui, la moindre erreur laissait l'écran figé sur

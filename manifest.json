@@ -4,7 +4,6 @@
   "description": "L'agenda en direct des Journées Portes Ouvertes du Groupe de la Banque mondiale en Côte d'Ivoire.",
   "lang": "fr",
   "dir": "ltr",
-  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
@@ -29,5 +28,6 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "_start_url": "Volontairement absent. Avec un start_url, iOS ouvre TOUJOURS cette adresse fixe et perd le jeton d'enregistrement inscrit dans l'adresse. Sans lui, l'icone nait avec l'adresse affichee au moment de l'ajout, jeton compris — c'est le seul pont entre Safari et l'ecran d'accueil."
 }
