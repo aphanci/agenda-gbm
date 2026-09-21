@@ -85,6 +85,11 @@
         "en": "World Bank–financed project"
       },
       {
+        "cle": "staff",
+        "fr": "Personnel du Groupe de la Banque mondiale",
+        "en": "World Bank Group staff"
+      },
+      {
         "cle": "ptf",
         "fr": "Partenaire technique et financier",
         "en": "Technical and financial partner"

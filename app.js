@@ -36,6 +36,7 @@
       enParallele: "en parallèle", aussiOuvert: "Aussi ouvert maintenant :",
       mesSessions: "Mes sessions", toutAgenda: "Tout l'agenda",
       jumpLabel: "Aller à maintenant",
+      majFaite: "Le programme vient d'être mis à jour.",
       statutVerrou: "Enregistrez-vous pour ouvrir le programme",
       astuceInstall: "Conseil : ajoutez d'abord l'agenda à votre écran d'accueil, puis enregistrez-vous depuis l'icône. Vous n'aurez à le faire qu'une seule fois.",
       astuceIOS: "Conseil : ajoutez d'abord l'agenda à votre écran d'accueil — touchez le bouton Partager en bas de l'écran, puis « Sur l'écran d'accueil » — et enregistrez-vous ensuite depuis l'icône. Vous n'aurez à le faire qu'une seule fois.",
@@ -116,6 +117,7 @@
       enParallele: "in parallel", aussiOuvert: "Also open now:",
       mesSessions: "My sessions", toutAgenda: "Full agenda",
       jumpLabel: "Jump to now",
+      majFaite: "The programme has just been updated.",
       statutVerrou: "Register to open the programme",
       astuceInstall: "Tip: add the agenda to your home screen first, then register from the icon. You will only have to do it once.",
       astuceIOS: "Tip: add the agenda to your home screen first — tap the Share button at the bottom of the screen, then « Add to Home Screen » — and register afterwards from the icon. You will only have to do it once.",
@@ -1317,6 +1319,63 @@
       });
   }
 
+  /* ============================================================
+     LA MISE À JOUR DU PROGRAMME, APRÈS L'ENREGISTREMENT
+     ============================================================
+     Le problème que ceci résout : le programme est remis UNE FOIS,
+     au moment de l'enregistrement, puis gardé sur le téléphone. Sans
+     ce qui suit, un agenda corrigé la veille — ou pendant l'événement
+     — n'atteindrait jamais les gens déjà enregistrés. Il faudrait
+     leur demander de se réinscrire, ce qui est absurde.
+
+     La règle, la même que pour l'annonce : ON AFFICHE D'ABORD, ON
+     VÉRIFIE ENSUITE. Le visiteur voit son programme immédiatement,
+     même sans réseau ; la vérification se fait derrière, et ne
+     remplace rien tant qu'elle n'a pas réussi.
+
+     Les trois précautions qui comptent :
+     • Sans réseau, ou si la base ne répond pas, on ne touche à rien.
+       Une panne de réseau ne doit JAMAIS effacer un programme valide.
+     • On ne remplace que si le numéro de version diffère : sinon on
+       repeindrait l'écran sous les doigts du visiteur pour rien.
+     • On range la nouvelle copie AVANT de l'installer à l'écran :
+       l'installation crée des renvois circulaires entre les journées
+       et leurs sessions, que JSON.stringify refuse ensuite d'écrire.
+     ============================================================ */
+  function rafraichirEnArrierePlan(conf, garde) {
+    var jeton = jetonConnu();
+    if (!jeton) return;   // enregistrement trop ancien : rien à demander
+
+    var versionLocale = (garde && garde.meta && garde.meta.version) || "";
+
+    reprendreAvecJeton(conf.inscription, jeton).then(function (frais) {
+      if (!frais) return;                       // hors réseau : on garde l'existant
+      var versionFraiche = (frais.meta && frais.meta.version) || "";
+      if (versionFraiche && versionFraiche === versionLocale) return;  // rien de neuf
+
+      garderProgramme(frais);                   // d'abord ranger…
+      installerProgramme(frais);                // …ensuite afficher
+      signalerMiseAJour();
+      console.info("Programme mis à jour :", versionLocale, "->", versionFraiche);
+    });
+  }
+
+  /* Le petit mot qui prévient. Sans lui, l'écran changerait tout seul
+     et le visiteur croirait s'être trompé de ligne. */
+  function signalerMiseAJour() {
+    var t = $("toast");
+    if (!t || !t.classList) return;
+    t.textContent = UI[LANGUE].majFaite;
+    t.hidden = false;
+    // On laisse un souffle au navigateur avant d'animer, sinon il
+    // peint l'état final directement et on ne voit rien apparaître.
+    window.setTimeout(function () { t.classList.add("vu"); }, 20);
+    window.setTimeout(function () {
+      t.classList.remove("vu");
+      window.setTimeout(function () { t.hidden = true; }, 400);
+    }, 5000);
+  }
+
   function garderProgramme(prog) {
     try { localStorage.setItem(CLE_PROG, JSON.stringify(prog)); } catch (e) { }
     partagerProgramme(prog);
@@ -1860,7 +1919,13 @@
         if (local && !partage) {
           partagerProgramme(local);
         }
-        if (garde) return suiteDuDemarrage(conf, garde);
+        if (garde) {
+          var suite = suiteDuDemarrage(conf, garde);
+          /* L'affichage est déjà lancé ; la vérification se fait DERRIÈRE,
+             sans jamais le retarder. Voir rafraichirEnArrierePlan. */
+          rafraichirEnArrierePlan(conf, garde);
+          return suite;
+        }
 
         /* Aucun programme sur cet appareil — mais peut-être un jeton
            dans l'adresse, hérité de l'installation depuis Safari. On
@@ -1889,7 +1954,24 @@
 
   function suiteDuDemarrage(conf, garde) {
     {
-      conf.jours = (garde && garde.jours) ? garde.jours : [];
+      /* D'OÙ VIENNENT LES SESSIONS — et la sortie de secours.
+
+         En marche normale, programme.json ne contient AUCUNE session :
+         elles arrivent de la base, après l'enregistrement. C'est ce qui
+         rend le verrou réel, et dans ce cas « garde » les porte.
+
+         Mais si la base devient injoignable le jour J, il faut pouvoir
+         publier un programme.json qui contient de nouveau ses sessions
+         et rouvrir l'agenda à tous. L'ancienne écriture jetait ces
+         sessions sans condition : la sortie de secours ne fonctionnait
+         pas. On respecte donc l'ordre de priorité suivant —
+         la copie du visiteur d'abord, le fichier ensuite, le vide en
+         dernier — ce qui ne change rien au verrou, puisqu'en marche
+         normale le fichier est vide de sessions. */
+      var duFichier = (conf.jours && conf.jours.length) ? conf.jours : null;
+      conf.jours = (garde && garde.jours && garde.jours.length)
+                 ? garde.jours
+                 : (duFichier || []);
       if (garde && garde.meta && garde.meta.categories) {
         conf.meta.categories = garde.meta.categories;
       }

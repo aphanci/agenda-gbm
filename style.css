@@ -1150,3 +1150,50 @@ body.verrouille { overflow: hidden; }
   font-weight: 700;
 }
 .astuce button:hover { background: var(--accent); color: var(--direct-texte); }
+
+/* ============================================================
+   LE MOT DE MISE À JOUR
+   ============================================================
+   Il apparaît quand le programme a changé pendant que le visiteur
+   avait l'application ouverte. Trois décisions :
+
+   • EN HAUT, pas en bas. Le bas de l'écran est déjà occupé par le
+     bandeau d'installation et par le bouton « Aller à maintenant » ;
+     un troisième élément s'y serait superposé à l'un ou à l'autre
+     selon le téléphone.
+   • Les couleurs sont celles du bandeau d'installation, déjà
+     éprouvées dans les deux thèmes. Réutiliser un couple validé
+     vaut mieux qu'en inventer un nouveau à vérifier.
+   • Il s'efface seul au bout de cinq secondes : c'est une
+     information, pas une décision à prendre.
+   ============================================================ */
+.toast {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  left: 50%;
+  z-index: 60;
+  max-width: min(92vw, 30rem);
+  margin: 0;
+  padding: .7rem 1rem;
+  border-radius: 12px;
+  background: var(--install-fond);
+  color: var(--install-titre);
+  box-shadow: var(--ombre);
+  font-size: .9rem;
+  line-height: 1.35;
+  text-align: center;
+  /* L'état de départ : décalé vers le haut et transparent. */
+  transform: translate(-50%, -14px);
+  opacity: 0;
+  transition: opacity .35s ease, transform .35s ease;
+}
+.toast.vu {
+  transform: translate(-50%, 0);
+  opacity: 1;
+}
+/* Certaines personnes règlent leur téléphone pour supprimer les
+   animations — souvent pour des raisons de confort visuel. On la
+   respecte : le mot apparaît, simplement, sans glisser. */
+@media (prefers-reduced-motion: reduce) {
+  .toast { transition: none; transform: translate(-50%, 0); }
+}

@@ -26,7 +26,7 @@
 /* Le numéro de version. À INCRÉMENTER à chaque modification d'un
    fichier : c'est ce qui force les navigateurs à reprendre la
    nouvelle version au lieu de servir l'ancienne indéfiniment. */
-const VERSION = "agenda-v24";
+const VERSION = "agenda-v25";
 
 /* La réserve du programme du visiteur. Elle ne porte PAS de numéro de
    version, et c'est voulu : elle ne contient pas des fichiers de
