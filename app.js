@@ -1472,8 +1472,8 @@
         + "collectés par " + resp + ", dans le seul but de " + fin + ". "
         + "Ils ne sont ni vendus, ni cédés à des tiers, ni utilisés à d'autres fins. "
         + "Ils sont conservés " + duree + ", puis supprimés. "
-        + (PROGRAMME.inscription
-            ? PROGRAMME.inscription.fr : "");
+        + (PROGRAMME.inscription.hebergement
+            ? PROGRAMME.inscription.hebergement.fr : "");
       $("avisDroits").textContent =
         (verrou
           ? "L'accès au programme suppose cet enregistrement. "
@@ -1487,8 +1487,8 @@
         + resp + ", for the sole purpose of " + fin + ". "
         + "They are never sold, passed to third parties, or used for anything else. "
         + "They are kept " + duree + ", then deleted. "
-        + (PROGRAMME.inscription
-            ? PROGRAMME.inscription.en : "");
+        + (PROGRAMME.inscription.hebergement
+            ? PROGRAMME.inscription.hebergement.en : "");
       $("avisDroits").textContent =
         (verrou
           ? "Access to the programme requires this registration. "
@@ -1844,10 +1844,21 @@
       /* On interroge les deux réserves. Celle de Safari d'abord, puis
          celle que l'écran d'accueil peut voir. */
       return lireProgrammePartage().then(function (partage) {
-        var garde = lireProgrammeGarde() || partage;
-        // Retrouvé par le pont seulement : on le recopie côté local.
-        if (!lireProgrammeGarde() && partage) {
+        var local = lireProgrammeGarde();
+        var garde = local || partage;
+
+        /* LES DEUX RÉSERVES SE RÉPARENT L'UNE L'AUTRE.
+           Il y a deux endroits où le programme du visiteur est posé, et
+           ils ne se vident pas pour les mêmes raisons. Plutôt que de
+           parier sur celui qui survivra, on recopie systématiquement
+           dans celui qui manque. Il faut alors DEUX enregistrements
+           perdus le même jour pour qu'un visiteur soit renvoyé au
+           formulaire — au lieu d'un seul. */
+        if (!local && partage) {
           try { localStorage.setItem(CLE_PROG, JSON.stringify(partage)); } catch (e) { }
+        }
+        if (local && !partage) {
+          partagerProgramme(local);
         }
         if (garde) return suiteDuDemarrage(conf, garde);
 

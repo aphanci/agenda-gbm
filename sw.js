@@ -26,7 +26,15 @@
 /* Le numéro de version. À INCRÉMENTER à chaque modification d'un
    fichier : c'est ce qui force les navigateurs à reprendre la
    nouvelle version au lieu de servir l'ancienne indéfiniment. */
-const VERSION = "agenda-v23";
+const VERSION = "agenda-v24";
+
+/* La réserve du programme du visiteur. Elle ne porte PAS de numéro de
+   version, et c'est voulu : elle ne contient pas des fichiers de
+   l'application, mais la copie personnelle du programme obtenue à
+   l'enregistrement. Elle doit survivre à toutes les mises à jour.
+   Voir le filtre dans « activate » plus bas — sans lui, chaque
+   changement de version effaçait l'enregistrement des visiteurs. */
+const CACHE_PARTAGE = "agenda-partage";
 
 /* Les fichiers mis en réserve dès l'installation. */
 const FICHIERS = [
@@ -54,12 +62,18 @@ self.addEventListener("install", (evenement) => {
 
 /* ---------- Activation ----------
    On profite du passage pour jeter les réserves des versions
-   précédentes, sinon elles s'accumuleraient sur l'appareil. */
+   précédentes, sinon elles s'accumuleraient sur l'appareil.
+
+   LE PIÈGE, corrigé ici : « toutes celles qui ne sont pas la version
+   courante » incluait aussi la réserve du programme du visiteur, qui
+   ne porte volontairement pas de numéro. Résultat, chaque mise à jour
+   effaçait l'enregistrement des gens. Il faut donc l'exclure
+   NOMMÉMENT, et non se fier au seul numéro de version. */
 self.addEventListener("activate", (evenement) => {
   evenement.waitUntil(
     caches.keys()
       .then((noms) => Promise.all(
-        noms.filter((nom) => nom !== VERSION)
+        noms.filter((nom) => nom !== VERSION && nom !== CACHE_PARTAGE)
             .map((nom) => caches.delete(nom))
       ))
       .then(() => self.clients.claim())

@@ -110,8 +110,12 @@
       "en": "compiling the list of participants in the Open Days of 21–22 September 2026 and sending you the event's documents and follow-up"
     },
     "conservation": {
-      "fr": "01 mois après l'événement",
-      "en": "01 month after the event"
+      "fr": "12 mois après l'événement",
+      "en": "12 months after the event"
+    },
+    "hebergement": {
+      "fr": "Pour la durée de l'événement, ces informations sont hébergées chez un prestataire technique externe, puis exportées et supprimées de cet hébergement.",
+      "en": "For the duration of the event, this information is hosted by an external technical provider, then exported and deleted from that hosting."
     }
   },
   "_jours": "Les sessions ne sont plus ici : elles vivent dans la base Supabase et ne sont remises qu'apres enregistrement. C'est ce qui rend le verrou reel."
